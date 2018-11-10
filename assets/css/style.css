@@ -1,0 +1,114 @@
+
+/**
+* Signin 
+*/
+body{ 
+
+    margin-top:8%;
+   
+    /*background: gainsboro;*/
+    font-family: Lato !important;
+}
+
+div#accueil{
+    
+  background-image: url("../images/cake.jpg");
+  /*background-position: center;*/
+  background-size: cover;
+}
+.accueil{
+    background-image: url("../images/cake.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    /*background-size: cover;*/
+  }
+
+.signin-label{
+    color:white;
+    font-weight: bold;
+}
+.btn-light{
+    color: #563d7c;
+    background-color: #f8f9fa;
+    border-color: #563d7c;
+}
+
+.signin-fa{
+  color:black;
+}
+
+.bd-navbar {
+    min-height: 4rem;
+    background-color: #563d7c;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.05), inset 0 -1px 0 rgba(0,0,0,.1);
+}
+
+.fond{
+    background:#E8E8E8;
+    /*border: 1px solid;*/
+    padding-bottom:4px;   
+}
+
+.header-menu{
+    font-family: Lato !important;
+    /*background-color: #84b749;*/
+    background-color:#563d7c;
+}
+/*---- Création d'une nouvelle agence---*/
+.marge-top{
+  margin-top:2em;
+  margin-bottom: 2em;
+}
+
+.message {
+
+    background-color: #ececec;
+    border-color: #41a560;
+    border-bottom: 3px solid rgba(0,0,0,.70);
+    /*color: #343a40b5;*/
+    color:#343a40;
+}
+
+.container-box{
+    
+    margin-top: 10%;
+    background-color: white;
+    border: 1px solid #434343;
+    border-radius: 4px;
+    margin-bottom:4px;
+}
+
+.footer{
+
+    background-color: #4f4f4f;
+    color: #fff;
+}
+
+.admin-space{
+
+    border:2px solid;
+}
+
+/*.img-taille{
+    width: 72px;
+    height: 72px;
+}*/
+
+.list-group-item.active {
+    z-index: 2;
+    color: #fff;
+    background-color: #ca2d3c;
+    border-color: #ca2d3c;
+}
+
+
+.recette{
+    padding:16px;
+    background-color:#f1f1f1; 
+    /*background-color:#ffffff; */
+    border:1px solid #ccc;
+}
+.shop{
+     background-color:#f1f1f1; 
+}
+
