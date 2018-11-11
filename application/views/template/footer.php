@@ -1,7 +1,6 @@
   <script type="text/javascript" src="<?php  echo  js_url('jquery'); ?>"></script>  
   <script type="text/javascript" src="<?php  echo  popper_url('popper'); ?>"></script> 
   <script type="text/javascript"> var base_url = "<?php echo base_url(); ?>" </script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script> -->
   <script type="text/javascript" src="<?php  echo  js_url('bootstrap'); ?>"></script> 
   <script type="text/javascript" src="<?php  echo  js_url('jquery-ui'); ?>"></script>
   <script type="text/javascript" src="<?php  echo js_url('code'); ?>"> </script>
