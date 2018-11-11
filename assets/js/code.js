@@ -186,10 +186,10 @@ $( document ).ready(function() {
     });
       
 
-   $("#list-profile-list").on("click",function(){
+  /* $("#list-profile-list").on("click",function(){
         get_list_menu();   
     });
-
+*/
     $( "#dataTable" ).on( "click", "td", function() {
         console.log( $( this ).text() );
       });

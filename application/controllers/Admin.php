@@ -86,7 +86,8 @@
       
       //Page des categories
       public function category(){
-        
+
+        $data['success'] = FALSE;
         $query = $this->db->get('categorie','5',$this->uri->segment(3));
         $config['base_url'] = base_url().'admin/category/';
         $query2 = $this->admin_model->list_menu();
@@ -96,7 +97,7 @@
         $this->pagination->initialize($config);
 
         $this->load->view('template/header');
-          $this->load_admin_menu();
+        $this->load_admin_menu();
 
         $this->load->view('adminsyst/category',$data);
 
@@ -161,9 +162,41 @@
        * supprimer un menu
        */
       public function delete_menu(){
+        
         $id = $this->uri->segment(3);
-        $this->admin_model->delete_menu($id);
-        redirect("admin/category"); 
+
+        if($this->admin_model->delete_menu($id)){
+
+          $query = $this->db->get('categorie','5',$this->uri->segment(3));
+          $config['base_url'] = base_url().'admin/category/';
+          $query2 = $this->admin_model->list_menu();
+          $config['total_rows'] = $query2->num_rows();
+          $data['success'] = 'success';
+          $data['message'] = "SUPPRESSION SUCCESS";
+          $this->pagination->initialize($config);
+          $this->load->view('template/header');
+          $this->load_admin_menu();
+          $this->load->view('adminsyst/category',$data);
+          $this->load->view('template/copyright');
+          $this->load->view('template/footer');
+        }else{
+
+          $data['success'] = 'fail';
+          $data['message'] = " ERREUR DE SUPPRESSION";
+          $query = $this->db->get('categorie','5',$this->uri->segment(3));
+          $config['base_url'] = base_url().'admin/category/';
+          $query2 = $this->admin_model->list_menu();
+          $config['total_rows'] = $query2->num_rows();
+          $data['success'] = 'success';
+          $data['message'] = "SUPPRESSION SUCCESS";
+          $this->pagination->initialize($config);
+          $this->load->view('template/header');
+          $this->load_admin_menu();
+          $this->load->view('adminsyst/category',$data);
+          $this->load->view('template/copyright');
+          $this->load->view('template/footer');
+        }
+
       }
 
 
@@ -616,7 +649,7 @@
      }
 
     
-     public function view(){
+    public function view(){
         $output = '';
         $output .= '
         <h3>Panier d\'Achat </h3><br />
@@ -672,7 +705,8 @@
         return $output;
      }
 
-    public  function load(){
+  
+     public  function load(){
         echo $this->view();
     }
 
@@ -1106,6 +1140,7 @@
      public function delete_table(){
        
       $id_table = $this->uri->segment(3);
+
       if($this->admin_model->delete_table($id_table)){
         $data['success'] = 'success';
         $data['message'] = "SUPPRESSION SUCCESS";

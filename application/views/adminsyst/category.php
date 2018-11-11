@@ -1,5 +1,10 @@
 <div class="container marge-top"> 
-   <h4  class="text-center"> <u>MENU DE LA VANILLE </u>  </h4>
+  
+   <div class="row">
+   <div class="col-md-12">  <h4  class="text-center text-success"> MENU GLACIER-RESTAURANT LA VANILLE</h4></div>
+   </div>
+   <br>
+   <?php  $this->load->view('adminsyst/alert.php'); ?>
     <div class="row">
       <div class="col-4">
         <div class="list-group" id="list-tab" role="tablist">
@@ -12,7 +17,6 @@
           <div class="tab-pane fade " id="list-home" role="tabpanel" aria-labelledby="list-home-list">
                 <?php require_once 'fraction1.php' ;  ?>
            </div>      
-        
           <div class="tab-pane fade show active" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
               <div>
               <?php //var_dump($list) ?>
@@ -27,9 +31,9 @@
                             <?php foreach($list->result() as $row): ?>
                                 <tr>
                                     <td> <?php echo $row->nom_cat; ?> </td>
-                                    <td><?php  echo anchor('admin/delete_menu/'.$row->id_cat, 'Supprimer', array('class' =>'btn btn-danger btn-sm')); ?> </td>  
+                                    <td> <?php echo anchor('admin/delete_menu/'.$row->id_cat, 'Supprimer', array('class' =>'btn btn-danger btn-sm','id' => 'delete_menu')); ?> </td>  
                                 </tr>
-                            <?php endforeach;?>         
+                            <?php endforeach; ?>         
                         </tbody>
                     </table>
                     <?php echo $this->pagination->create_links();  ?>
