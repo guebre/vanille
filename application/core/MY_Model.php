@@ -43,20 +43,30 @@ class MY_Model extends CI_Model {
     public function update_plat(){
 
       $data = array(
+
         'nom_plat' => strtoupper($this->input->post('nom_plat')),
         //'photo_prod'  => $this->input->post('photo_prod'),
         'prix'  => $this->input->post('prix'),
         //'id_prod' => $this->input->post('produit'),
         'id_cat'  => $this->input->post('categorie')
         );
-
+        
         if($this->input->post('qte') > 0 && $this->input->post('qte_seuil') > 0 ){
           $data['quantite'] = $this->input->post('qte');
           $data['quantite_seuil'] = $this->input->post('qte_seuil');
+  
+        }else{
+          //Si la quantite=quantite_seuil ==0
+          /*$this->db->set('nom_plat',strtoupper($this->input->post('nom_plat')));
+           $this->db->set('prix',$this->input->post('prix'));
+          $this->db->set('id_cat', $this->input->post('categorie'));
+          */
+         $data['quantite'] = 0;
+         $data['quantite_seuil'] = 0; 
         }
 
-       $this->db->where('id_plat',$this->input->post('identifiant')); 
-       return $this->db->update("plats",$data);
+        $this->db->where('id_plat',$this->input->post('identifiant')); 
+          return $this->db->update("plats",$data);
     }
 
     /**
@@ -120,13 +130,14 @@ class MY_Model extends CI_Model {
     * Liste des produits
     */
     public function liste_plats(){
-         return $this->db->get("plats"); 
+         return $this->db->get_where("plats",array('statut'=>1)); 
         //SELECT * FROM plats INNER JOIN categorie ON plats.id_cat = categorie.id_cat
     }
 
     public function liste_plats2($limit,$start){
        
        $this->db->select('*');
+       $this->db->where('statut',1);
        $this->db->from('plats');
        $this->db->join('categorie', 'plats.id_cat = categorie.id_cat','left');
        $this->db->limit($limit,$start);
@@ -173,8 +184,12 @@ class MY_Model extends CI_Model {
     /**
     * delete a plat
     */
-    public function delete_recette($id){
-        return $this->db->delete("plats",array("id_plat" => $id));
+    public function delete_recette($id){ 
+
+      $data = array('statut'=>0);
+      $this->db->where('id_plat',$id); 
+      return $this->db->update("plats",$data);
+      //return $this->db->delete("plats",array("id_plat" => $id));
     }
 
    

@@ -430,11 +430,12 @@
         $this->form_validation->set_rules($config);
      
       if($this->form_validation->run() == FALSE){
-          // Liste de categorie de produits
+
+          // Liste de categorie de plats 
           $data['list'] = $this->admin_model->list_menu();
           $data['success'] = FALSE; 
           $this->load->view('template/header');
-            $this->load_admin_menu();
+          $this->load_admin_menu();
 
           $this->load->view('adminsyst/plat_new',$data);
 
@@ -448,10 +449,10 @@
                 // Liste de categorie de produits
                 $data['list'] = $this->admin_model->list_menu();
                 $data['success'] = TRUE; 
-                $data['message'] =  " INSERTION SUCCESS ->  <span class='text-info'>". $this->input->post('nom_plat')."</span> ";
+                $data['message'] =  "INSERTION SUCCESS ->  <span class='text-info'>". $this->input->post('nom_plat')."</span> ";
 
                 $this->load->view('template/header');
-                  $this->load_admin_menu();
+                $this->load_admin_menu();
 
                 $this->load->view('adminsyst/plat_new',$data);
 
@@ -650,50 +651,56 @@
 
     
     public function view(){
+
         $output = '';
         $output .= '
         <h3>Panier d\'Achat </h3><br />
         <div class="table-responsive">
-        <div align="right">
-          <button type="button" id="clear_cart" class="btn btn-warning">Annuler Vente </button>
-        </div>
-        <br />
-        <table class="table table-bordered">
-          <tr>
-          <th width="40%">Nom</th>
-          <th width="15%">Quantit&eacute;</th>
-          <th width="15%">Prix</th>
-          <th width="15%">Total</th>
-          <th width="15%">Action</th>
-          </tr>';
+            <div align="right">
+              <button type="button" id="clear_cart" class="btn btn-warning">Annuler Commande </button>
+            </div>
+            <br/>
+            <table class="table table-bordered">
+              <tr>
+              <th width="40%">Nom</th>
+              <th width="15%">Quantit&eacute;</th>
+              <th width="15%">Prix</th>
+              <th width="15%">Total</th>
+              <th width="15%">Action</th>
+              </tr>';
 
-         $count = 0;
-        foreach($this->cart->contents() as $items)
-        {
-          $count++;
-          $output .= '
-          <tr> 
-            <td>'.$items["name"].'</td>
-            <td>'.$items["qty"].'</td>
-            <td>'.$items["price"].'</td>
-            <td>'.$items["subtotal"].'</td>
-            <td><button type="button" name="remove" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
-          </tr>
-          ';
-        }
-        $output .= '
-        <tr>
-          <td colspan="4" align="right">Total</td>
-          <td>'.$this->cart->total().'</td>
-        </tr>
-        </table>
+            $count = 0;
+            foreach($this->cart->contents() as $items)
+            {
+              $count++;
+              $output .= '
+              <tr> 
+                <td>'.$items["name"].'</td>
+                <td>'.$items["qty"].'</td>
+                <td>'.$items["price"].'</td>
+                <td>'.$items["subtotal"].'</td>
+                <td><button type="button" name="remove" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
+              </tr>
+              ';
+            }
+            $output .= '
+            <tr>
+              <td colspan="4" align="right">Total</td>
+              <td>'.$this->cart->total().'</td>
+            </tr>
+            </table>
         </div>';
         
         if($count != 0)
         {
           $output .='
+          <div class="text-right">
+             <select class="form-control"> 
+                <option> Choisir  table </option> 
+             </select> 
+          </div>
           <div align="right">
-             <button id="save_vente" type="button"  class="btn btn-primary">Valider Vente </button>
+             <button id="save_vente" type="button"  class="btn btn-primary">Enregister Commande </button>
           </div>';
         }
        
@@ -703,13 +710,69 @@
            $output = '<h3 align="center">Panier vide </h3>';
         }
         return $output;
+
      }
 
-  
-     public  function load(){
-        echo $this->view();
+    public function default_view(){
+      $output = '';
+      $output .= '
+      <h3>Panier d\'Achat </h3><br />
+      <div class="table-responsive">
+      <div align="right">
+        <button type="button" id="clear_cart" class="btn btn-warning">Annuler Vente </button>
+      </div>
+      <br />
+      <table class="table table-bordered">
+        <tr>
+        <th width="40%">Nom</th>
+        <th width="15%">Quantit&eacute;</th>
+        <th width="15%">Prix</th>
+        <th width="15%">Total</th>
+        <th width="15%">Action</th>
+        </tr>';
+
+       $count = 0;
+      foreach($this->cart->contents() as $items)
+      {
+        $count++;
+        $output .= '
+        <tr> 
+          <td>'.$items["name"].'</td>
+          <td>'.$items["qty"].'</td>
+          <td>'.$items["price"].'</td>
+          <td>'.$items["subtotal"].'</td>
+          <td><button type="button" name="remove" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
+        </tr>
+        ';
+      }
+      $output .= '
+      <tr>
+        <td colspan="4" align="right">Total</td>
+        <td>'.$this->cart->total().'</td>
+      </tr>
+      </table>
+      </div>';
+      
+      if($count != 0)
+      {
+        $output .='
+        <div align="right">
+           <button id="save_vente" type="button"  class="btn btn-primary">Valider Vente </button>
+        </div>';
+      }
+     
+
+      if($count == 0)
+      {
+         $output = '<h3 align="center">Panier vide </h3>';
+      }
+      return $output;
     }
 
+
+   public  function load(){
+      echo $this->view();
+  }
     public function remove(){
 
       $row_id = $_POST["row_id"];
@@ -1171,7 +1234,29 @@
     * Page de gestion des nouvelles commandes
     */
  
-    public function commande_vente(){ 
+  public function commande(){ 
+     //$this->plats_data(); 
+     $data['success'] = FALSE;
+     $query = $this->admin_model->liste_plats2(6,$this->uri->segment(3));
+     $data['list'] = $query->result();
+
+     //Get full row of product
+     $query2 = $this->admin_model->liste_plats();
+     $config['per_page'] =6;
+     $config['base_url'] = base_url('admin/commande/');
+     $config['total_rows'] = $query2->num_rows();
+     $this->pagination->initialize($config);
+
+    $this->load->view('template/header');
+    $this->load_admin_menu();
+    $this->load->view('adminsyst/commande',$data);
+    $this->load->view('template/copyright');
+    $this->load->view('template/footer');
+
+  }
+
+  // Cette page servira de squelette de page
+  public function template(){ 
 
     $this->load->view('template/header');
     $this->load_admin_menu();
@@ -1180,6 +1265,9 @@
     $this->load->view('template/footer');
 
   }
+
+
+
 
 }
 
