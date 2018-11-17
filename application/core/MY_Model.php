@@ -118,6 +118,10 @@ class MY_Model extends CI_Model {
        );
        return $this->db->insert('van_table',$data);   
     }
+    //Obtenir la liste des tables
+    public function get_table(){
+      return $this->db->get('van_table')->result();
+    }
 
     /**
      * Supprimer une table 

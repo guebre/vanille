@@ -654,20 +654,22 @@
 
         $output = '';
         $output .= '
-        <h3>Panier d\'Achat </h3><br />
+        <div class="row">
+          <div class="col-md-12"> <h3 class="text-center">Panier d\'Achat </h3><br /> </div>
+        </div>
+        <div class="row">
+            <div class="col text-right"> <button type="button" id="clear_cart" class="btn btn-warning">Annuler Commande </button> </div> 
+        </div>
+        <br>
         <div class="table-responsive">
-            <div align="right">
-              <button type="button" id="clear_cart" class="btn btn-warning">Annuler Commande </button>
-            </div>
-            <br/>
-            <table class="table table-bordered">
-              <tr>
-              <th width="40%">Nom</th>
-              <th width="15%">Quantit&eacute;</th>
-              <th width="15%">Prix</th>
-              <th width="15%">Total</th>
-              <th width="15%">Action</th>
-              </tr>';
+          <table class="table table-bordered">
+            <tr>
+            <th width="40%">Nom</th>
+            <th width="15%">Quantit&eacute;</th>
+            <th width="15%">Prix</th>
+            <th width="15%">Total</th>
+            <th width="15%">Action</th>
+            </tr>';
 
             $count = 0;
             foreach($this->cart->contents() as $items)
@@ -689,28 +691,35 @@
               <td>'.$this->cart->total().'</td>
             </tr>
             </table>
-        </div>';
-        
+        </div>'; 
         if($count != 0)
         {
           $output .='
-          <div class="text-right">
-             <select class="form-control"> 
-                <option> Choisir  table </option> 
-             </select> 
-          </div>
-          <div align="right">
-             <button id="save_vente" type="button"  class="btn btn-primary">Enregister Commande </button>
-          </div>';
-        }
-       
+          <div class="row">
+            <div class="col text-right"> 
+                <form>
+                <select class="form-control" name="cmd_table" id="table_list"> 
+                    <option value="default"> Choisir  Table </option> ';
 
+                    $data = $this->admin_model->get_table();
+                    foreach($data as $item ){
+                       $output.='<option value='.$item->id.'>'.$item->code_table.'</option>';
+                    }
+                $output.='</select> 
+                </form>
+            </div>
+          </div><br>
+          <div class="row">
+             <div class="col text-right">
+                 <button id="save_vente" type="button"  class="btn btn-primary" disabled>Enregister Commande </button>
+              </div>
+          </div>';    
+        }
         if($count == 0)
         {
            $output = '<h3 align="center">Panier vide </h3>';
         }
         return $output;
-
      }
 
     public function default_view(){
@@ -769,10 +778,9 @@
       return $output;
     }
 
-
    public  function load(){
       echo $this->view();
-  }
+    }
     public function remove(){
 
       $row_id = $_POST["row_id"];
@@ -793,6 +801,12 @@
   * Fonction de Test
   */
   public function debog(){
+
+    $data = $this->admin_model->get_table();
+    foreach($data as $row){
+     echo($row->id.'<br>');
+
+    }
 
   }
   private function vente_status($status = 0){

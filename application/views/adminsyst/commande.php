@@ -49,7 +49,7 @@
                             <h6>'.$row->nom_plat.'</h6>
                             <h5 class="text-danger">'.$row->prix.' Cfa</h5>
                             <input type="number" name="quantity" class="form-control quantity" id="'.$row->id_plat.'" /><br />
-                            <button type="button" name="add_cart" class="btn btn-success add_cart" data-productname="'.$row->nom_plat.'" data-price="'.$row->prix.'" data-productid="'.$row->id_plat.'" /><!--Add to Cart--> Ajouter au Panier </button>
+                            <button type="button" name="add_cart" class="btn btn-success add_cart" data-productname="'.$row->nom_plat.'" data-price="'.$row->prix.'" data-productid="'.$row->id_plat.'" />Ajouter au Panier </button>
                             </div>
                             ';
                         }
