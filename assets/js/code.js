@@ -49,6 +49,7 @@ $( document ).ready(function() {
         var product_price = $(this).data("price");
         var quantity = $('#'+product_id).val();
         //alert(quantity+'   '+product_id);
+
         if(quantity != '' && quantity > 0)
         {
             $.ajax({
@@ -60,6 +61,8 @@ $( document ).ready(function() {
                     alert("Produit  a été ajouté au panier");
                     $('#cart_details').html(data);
                     $('#'+product_id).val('');
+                    //Activation du select des tables
+                    $('#table_list').show();
                 }
             });
         }
@@ -69,32 +72,54 @@ $( document ).ready(function() {
         }
        });
 
-
+   
+     
     $('#cart_details').load(base_url+'admin/load');
     //Chargement de la vente du jour
+    /*var str = $('#cart_details').html();
+    console.log('la valeur est:'+str);
+    if(str ==''){
+        $('#table_list').hide();
+    }*/
 
-    
+   /* $('#table_list').on('change',function(){
+        //alert(this.value);
+        //alert($('#cart_details').text())
+     });*/
+     
 
     $('vente_status').html('');
 
     $(document).on('click', '#save_vente', function(){
 
+      var numbTab = $('#table_list').val();
+      if(numbTab == ''){
+
+        alert('Veuillez choisir la table du client');
+
+      }else{
+
         if(confirm("Voulez vous vraiment enregister la vente?"))
         {
-         $.ajax({
-          url:base_url+"admin/insert_vente",
-          success:function(data)
-          {
-           //alert("Votre effectué");
-           $('#vente_status').html(data);
-           $('#cart_details').load(base_url+'admin/load');
-          }
-         });
+            $.ajax({
+                url:base_url+"admin/insert_vente1",
+                method:"POST",
+                data:{id_table: numbTab},
+                success:function(data)
+                {
+                //alert("Votre effectué");
+                $('#vente_status').html(data);
+                $('#cart_details').load(base_url+'admin/load');
+                }
+            });
         }
         else
         {
-         return false;
+           return false;
         }
+      }
+       
+        
     });
 
 
@@ -194,12 +219,104 @@ $( document ).ready(function() {
     $( "#dataTable" ).on( "click", "td", function() {
         console.log( $( this ).text() );
       });
+    
+    //Rechecher une commande
+    $(document).on('click','#find_tab',function(event){
 
-    $("#table_list").change(function(){
-        alert("ok");
+        event.preventDefault();
+        //obtenir l'id de la table
+        var id_tab = $('#table-cli').val();
+        var code_tab = $('#table-cli option:selected').text();
+        //alert(code_tab);
+        //alert(id_tab);
+        if(id_tab ==''){
+            alert('Veuillez choisir un numero de table');
+        }else{
+
+            $.ajax({
+                url:base_url+"admin/get_a_commande",
+                method:"POST",
+                data:{id_tab : id_tab,code_tab: code_tab},
+                success:function(data){
+                     $('#row_commande').html(data);
+                },
+                error:function(){
+                 
+                }
+            });
+        }
+
     });
+  /**
+   * Ajout de ligne commande
+   **/ 
+    $('.modal-body').load(base_url+'admin/commande1');
+    $('#exampleModalLong').on('show.bs.modal', function (event) {
+        let id_tab = $('#table-cli').val();
+        let code_tab = $('#table-cli option:selected').text();
+        //var button = $(event.relatedTarget); // Button that triggered the modal
+        //alert('#add_cart').val();
+        //var recipient = button.data('whatever') // Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this);
 
+        //modal.find('.modal-title').text('New message to ' + recipient)
+        //modal.find('.modal-body input').val(recipient)
+        modal.find('.modal-title').text('Ajout de produit à la table numero'+ code_tab);
+        //modal.find('.modal-body').load(base_url+'admin/commande1');
+
+      });
+
+    $('body').on('click','ul#search_page_pagination>li>a',function(e){
+        e.preventDefault();  // prevent default behaviour for anchor tag
+        let Pagination_url = $(this).attr('href'); // getting href of <a> tag
+       
+        $.ajax({
+            url:Pagination_url,
+            type:'POST',
+            success:function(data){
+            //var $page_data = $(data);
+            $('.modal-body').html(data);
+            // $('table').addClass('table');
+            }
+        });
+       // $('#exampleModalLong').modal('show');
+
+    });
+    // Si le modal est visible sur l'ecran 
+    $('#exampleModalLong').on('shown.bs.modal', function (e) {
+       
+        $('#add_cart1').click(function(){
+           let product_id = $(this).data("productid1");
+           let product_name = $(this).data("productname1");
+           let product_price = $(this).data("price1");
+           var quantity = $('#'+product_id).val();
+           //alert(quantity+'   '+product_id);
    
-      
-
+           if(quantity != '' && quantity > 0)
+           {
+               $.ajax({
+                   url:base_url+"admin/add_lign_commande",
+                   method:"POST",
+                   data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity},
+                   success:function(data)
+                   {
+                       alert("Produit a été ajouté  a la commande");
+                       $('#row_commande').html(data);
+                       //$('#'+product_id).val('');
+                       //Activation du select des tables
+                       //$('#table_list').show();
+                   }
+               });
+           }
+           else
+           {
+             alert("Please entrer la quantité");
+           }
+          });
+   
+    });
+   
+  
 });

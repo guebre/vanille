@@ -4,6 +4,10 @@
         <div class="col-md-12">   <h4  class="text-center"> <u> Espace Vente </u>  </h4></div>
     </div>-->
     <div class="row">
+         <div class="col" id="vente_status">  </div>
+    </div>
+
+    <div class="row">
             <div class="col-9">
                 <?php
                     $attribute2 = array(
@@ -57,9 +61,12 @@
                     </div>
             </div>           
             <div class="col-lg-6 col-md-6">
+                
                 <div id="cart_details">
-                    <!--<h3 class="text-center">Cart is Empty</h3>-->
+
                 </div>
+            
+              
             </div>
             
     </div>   

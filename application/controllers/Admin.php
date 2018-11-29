@@ -1,6 +1,5 @@
 <?php  
   defined('BASEPATH') OR exit('No direct script access allow');
-
   /**
    * Administrateur du système
    */
@@ -25,7 +24,7 @@
         $this->config->load('vanille_setting');
         
          
-    }
+      }
 
       public function index(){
         $this->load->view('template/header');
@@ -62,7 +61,6 @@
               $this->session->sess_destroy();
               redirect('accueil');
       }
-     
 
       // Mette le statut à 1  
       public function set_status(){
@@ -296,7 +294,7 @@
         
       }
 
-     
+    
       public function delete_product(){
 
         $id = $this->uri->segment(3);
@@ -311,8 +309,6 @@
           redirect("admin/product",$data); 
         }
       }
-
-
     /***
      * 
      * Modifier un produit 
@@ -354,7 +350,6 @@
          
         
      }
-
     /**
      * Pour eviter la repetion
      */
@@ -462,7 +457,6 @@
           }
       
      }
-
      /**
      * Modifier une recette
      */
@@ -570,7 +564,6 @@
         
 
      }
-
      /**
       * Supprimer une recette
       */
@@ -639,18 +632,17 @@
 
      public function add_shopping(){
 
-        $data = array(
-          "id" => $_POST['product_id'],
-          "name" => $_POST['product_name'],
-          "qty" => $_POST['quantity'],
-          "price" => $_POST['product_price']
-        ); 
-        $this->cart->insert($data);
-        echo $this->view();
+      $data = array(
+        "id" => $_POST['product_id'],
+        "name" => $_POST['product_name'],
+        "qty" => $_POST['quantity'],
+        "price" => $_POST['product_price']
+      ); 
+      $this->cart->insert($data);
+      echo $this->view();
      }
-
     
-    public function view(){
+     public function view(){
 
         $output = '';
         $output .= '
@@ -670,7 +662,6 @@
             <th width="15%">Total</th>
             <th width="15%">Action</th>
             </tr>';
-
             $count = 0;
             foreach($this->cart->contents() as $items)
             {
@@ -696,22 +687,19 @@
         {
           $output .='
           <div class="row">
-            <div class="col text-right"> 
-                <form>
-                <select class="form-control" name="cmd_table" id="table_list"> 
-                    <option value="default"> Choisir  Table </option> ';
-
-                    $data = $this->admin_model->get_table();
-                    foreach($data as $item ){
-                       $output.='<option value='.$item->id.'>'.$item->code_table.'</option>';
-                    }
-                $output.='</select> 
-                </form>
-            </div>
-          </div><br>
+          <div class="col text-right"> 
+            <select class="form-control" name="cmd_table" id="table_list"> 
+                <option value=""> CHOISIR LA TABLE DU CLIENT </option>';
+                $data = $this->admin_model->get_table();
+                foreach($data as $item ){ 
+                    $output.='<option value='.$item->id.'>'.$item->code_table.'</option>';
+                  }
+            $output.='</select> <br>
+          </div>
+        </div>
           <div class="row">
              <div class="col text-right">
-                 <button id="save_vente" type="button"  class="btn btn-primary" disabled>Enregister Commande </button>
+                 <button id="save_vente" type="button"  class="btn btn-primary">Enregister Commande </button>
               </div>
           </div>';    
         }
@@ -778,444 +766,480 @@
       return $output;
     }
 
-   public  function load(){
+    public  function load(){
       echo $this->view();
     }
+
     public function remove(){
 
-      $row_id = $_POST["row_id"];
-      $data = array(
-      'rowid'  => $row_id,
-      'qty'  => 0
-      );
-      $this->cart->update($data);
-      echo $this->view();
+        $row_id = $_POST["row_id"];
+        $data = array(
+        'rowid'  => $row_id,
+        'qty'  => 0
+        );
+        $this->cart->update($data);
+        echo $this->view();
     }
 
     public function clear(){
       $this->cart->destroy();
       echo $this->view();
+    }   
+    /**
+      * Fonction de Test
+    */
+    public function debog(){
+
+        $data = $this->admin_model->get_table();
+        foreach($data as $row){
+        echo($row->id.'<br>');
+        }
     }
-  
- /**
-  * Fonction de Test
-  */
-  public function debog(){
+    private function vente_status($status = 0){
+      $output = '';
 
-    $data = $this->admin_model->get_table();
-    foreach($data as $row){
-     echo($row->id.'<br>');
+      if($status == 0){
+        $output .= '';
+      }elseif($status == 1){
+          $output .= '<!--<div class="alert alert-success" role="alert">
+        La vente  a été éffectué   <a href="'.base_url('admin/etats').'" class="alert-link"> Etat de ventes </a>. 
+          </div>-->';
 
-    }
+          $output .= '<div class="alert alert alert-success alert-dismissible fade show" role="alert">
+          La vente  a été éffectué   <a href="'.base_url('admin/etats').'" class="alert-link"> Etat de ventes </a>.
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>';
 
-  }
-  private function vente_status($status = 0){
-    $output = '';
-
-    if($status == 0){
-      $output .= '';
-    }elseif($status == 1){
-         $output .= '<!--<div class="alert alert-success" role="alert">
-       La vente  a été éffectué   <a href="'.base_url('admin/etats').'" class="alert-link"> Etat de ventes </a>. 
+      }elseif($status == 2) {
+        $output .='<!--<div class="alert alert-danger" role="alert">
+          Nous ne pouvons pas prendre en compte votre vente suite à  erreur.  
         </div>-->';
 
-        $output .= '<div class="alert alert alert-success alert-dismissible fade show" role="alert">
-        La vente  a été éffectué   <a href="'.base_url('admin/etats').'" class="alert-link"> Etat de ventes </a>.
+        $output .='<div class="alert alert-warning alert-dismissible fade show" role="alert">
+        Nous ne pouvons pas prendre en compte votre vente suite à  erreur.
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>';
 
-    }elseif($status == 2) {
-       $output .='<!--<div class="alert alert-danger" role="alert">
-         Nous ne pouvons pas prendre en compte votre vente suite à  erreur.  
-       </div>-->';
-
-       $output .='<div class="alert alert-warning alert-dismissible fade show" role="alert">
-       Nous ne pouvons pas prendre en compte votre vente suite à  erreur.
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-         </div>';
-
-    } 
-    return  $output;     
-  }
-  public function nb_vente(){
-    $row = $this->admin_model->count_all_vente()->row(); 
-    if(isset($row)){
-      $nb = $row->nb;
+      } 
+      return  $output;     
     }
-    return $nb+1;
+    public function nb_vente(){
+      $row = $this->admin_model->count_all_vente()->row(); 
+      if(isset($row)){
+        $nb = $row->nb;
+      }
+      return $nb+1;
 
-  }
-  public function insert_vente(){
-    
-    $nb = $this->nb_vente();
-    $data = array(); //data contiendra d'une vente
-    foreach( $this->cart->contents() as $items ){
-      $row = array (
+    }
+    public function insert_vente1(){
+      
+      $nb = $this->nb_vente();
+      $data = array(); //data contiendra d'une vente
+      $data1 = array(); //data contiendra d'une vente
+      foreach( $this->cart->contents() as $items ){
+        /*$row = array (
+            'id_plat' => $items["id"],
+            'id_user' => $this->session->userdata('id_user'),
+            'prix'    => $items["subtotal"],
+            'quantite'    => $items["qty"],
+            'code_facture' => $nb
+        );*/
+        $row = array (
           'id_plat' => $items["id"],
           'id_user' => $this->session->userdata('id_user'),
           'prix'    => $items["subtotal"],
           'quantite'    => $items["qty"],
-          'code_facture' => $nb
+          'id_table' =>$this->input->post('id_table')
       );
-      $data [] = $row;
-    }
-    //var_dump($data);
-    // insertion dans la base 
-    if($this->admin_model->add_vente($data) > 0 ){ //insertion ok 
+        $data [] = $row;
        
-       //Diminuer la quantité de chaque produit ici 
-        $this->cart->destroy();
-        echo $this->view();
-        echo $this->vente_status(1);
+      }
+      //var_dump($data);
+      // insertion dans la base 
+      if($this->admin_model->add_commande($data) > 0 ){ //insertion ok 
+        
+        //Diminuer la quantité de chaque produit ici 
+          $this->cart->destroy();
+          echo $this->view();
+          echo $this->vente_status(1);
 
-    }else{
-        echo  $this->vente_status(2);
+      }else{
+          echo  $this->vente_status(2);
+      }
+
     }
+    public function insert_vente(){
+      
+      $nb = $this->nb_vente();
+      $data = array(); //data contiendra d'une vente
+      $data1 = array(); //data contiendra d'une vente
+      foreach( $this->cart->contents() as $items ){
+        $row = array (
+            'id_plat' => $items["id"],
+            'id_user' => $this->session->userdata('id_user'),
+            'prix'    => $items["subtotal"],
+            'quantite'    => $items["qty"],
+            'code_facture' => $nb
+        );
 
-  }
-  public function etats(){
-    $data = array(
-      'year' =>$this->uri->segment(3),
-      'month' =>$this->uri->segment(4)
-    );
-    $prefs['template'] = '
-    {table_open}<table class="table" id="dataTable">{/table_open}
+        $data [] = $row;
+      
+      }
+      //var_dump($data);
+      // insertion dans la base 
+      if($this->admin_model->add_vente($data) > 0 ){ //insertion ok 
+        
+        //Diminuer la quantité de chaque produit ici 
+          $this->cart->destroy();
+          echo $this->view();
+          echo $this->vente_status(1);
 
-    {heading_row_start}<tr>{/heading_row_start}
+      }else{
+          echo  $this->vente_status(2);
+      }
 
-    {heading_previous_cell}<th><a href="{previous_url}" class="btn btn-info btn-sm">Prev</a></th>{/heading_previous_cell}
-    {heading_title_cell}<th colspan="{colspan}"><span class="text-success">{heading}</span></th>{/heading_title_cell}
-    {heading_next_cell}<th><a href="{next_url}" class="btn btn-info btn-sm">Next</a></th>{/heading_next_cell}
-
-    {heading_row_end}</tr>{/heading_row_end}
-
-    {week_row_start}<tr>{/week_row_start}
-    {week_day_cell}<td>{week_day}</td>{/week_day_cell}
-    {week_row_end}</tr>{/week_row_end}
-    
-    {cal_row_start}<tr>{/cal_row_start}
-    {cal_cell_start}<td><span class="btn btn-light btn-sm">{/cal_cell_start} 
-    {cal_cell_start_today}<td class="today"><span class="btn btn-dark btn-sm">{/cal_cell_start_today}
-    {cal_cell_start_other}<td class="other-month">{/cal_cell_start_other}
-
-    {cal_cell_content}<a href="{content}">{day}</a> {/cal_cell_content}
-    {cal_cell_content_today}<div class="highlight"><a href="{content}" >{day}</a></div>{/cal_cell_content_today}
-
-    {cal_cell_no_content}{day}{/cal_cell_no_content}
-    {cal_cell_no_content_today}<div class="highlight">{day}</div>{/cal_cell_no_content_today}
-
-    {cal_cell_blank}&nbsp;{/cal_cell_blank}
-
-    {cal_cell_other}{day} {/cal_cel_other}
-
-    {cal_cell_end}</span></td>{/cal_cell_end}
-    {cal_cell_end_today}</span></td>{/cal_cell_end_today}
-    {cal_cell_end_other}</td>{/cal_cell_end_other}
-    {cal_row_end}</tr>{/cal_row_end}
-
-    {table_close}</table>{/table_close}';
-    $prefs['show_next_prev'] = TRUE;
-
-    $this->load->library('calendar', $prefs);
-
-    $this->load->view('template/header');
-      $this->load_admin_menu();
-    
-    $this->load->view('adminsyst/etats',$data);
-    //echo $this->calendar->generate($this->uri->segment(3), $this->uri->segment(4));
-    
-    $this->load->view('template/copyright');
-    $this->load->view('template/footer');
-
-  }
-  public function show_vente(){
-
-    $vente_date= $this->admin_model->get_etat_per_date('2018-10-28');
-    $output ='';
-    $output.='Etats de la vente de 2018-10-28';
-    $output .='<table class="table table-responsive"> 
-              <thead class="thead-dark">
-                <tr>
-                  <th>Menu</th>
-                  <th>Montant</th>
-                </tr>
-              </thead>
-            <tbody>';
-    $somme = 0;   
-    foreach($vente_date as $row){
-
-      $somme+= $row->montant;
-      $output .= '<tr> 
-        <td>'.$row->nom_cat.'</td>
-        <td>'.$row->montant.' Cfa </td>
-        </tr>';   
     }
-    $output .= '<tr> 
-    <td>Total</td>
-    <td>'.$somme.'Cfa </td>
-    </tr>'; 
-    $output.='</tbody></table>';
-
-    $this->load->view('template/header');
-      $this->load_admin_menu();
-      echo $output;
-    $this->load->view('template/copyright');
-    $this->load->view('template/footer');      
-
-  }
-
-  public function  today_sel($date =''){
-
-    //$date = date('yyyy-mm-dd');
-    if(empty($date)){
-      $moment = date('Y-m-d');
-    }else{
-      $moment = $date;
-    }
-
-    $vente_date= $this->admin_model->get_etat_per_date($moment);
-    $output ='';
-    $output.='<h4 class="text-danger text-center font-italic"> <u>Etats de vente de '.$moment.' </u></h4>';
-    $output .='<table class="table table-responsive table-bordered"> 
-              <thead class="bg-secondary text-white">
-                <tr>
-                  <th scope="col">Menu</th>
-                  <th scope="col">Montant</th>
-                </tr>
-              </thead>
-            <tbody>';
-    $somme = 0;   
-    foreach($vente_date as $row){
-
-      $somme+= $row->montant;
-      $output .= '<tr> 
-        <td>'.$row->nom_cat.'</td>
-        <td>'.$row->montant.' Cfa </td>
-        </tr>';   
-    }
-    $output .= '<tr class="bg-danger text-white font-weight-bold "> 
-    <td >Total</td>
-    <td>'.$somme.' Cfa </td>
-    </tr>'; 
-    $output.='</tbody></table>';
-
-    if($somme == 0){
-      $output = '<h4 class="text-danger text-center font-italic"> Pas de vente à ce jour du '.$moment.' </h4>';
-    }
-    echo $output;
-
-  }
-  public function to_day_sel(){
-
-    $date = $_POST['date'];
-    $this->today_sel($date);
-
-  }
-  // Page des utilisateurs
-  public function  users (){
-    
-     $data['success'] = FALSE;
-    // $query = $this->admin_model->liste_users2(5,$this->uri->segment(3));
-    // $data['list'] = $query->result();
-     //Get full row of users
-     /*$query2 = $this->admin_model->liste_users();
-     $config['base_url'] = base_url('admin/plats/');
-     $config['total_rows'] = $query2->num_rows();
-     $this->pagination->initialize($config);*/
-     $query=$this->admin_model->get_users_except();
-     $data['list'] = $query->result();
-     $this->load->view('template/header');
-       $this->load_admin_menu();
-     $this->load->view('adminsyst/users',$data);
-     $this->load->view('template/copyright');
-     $this->load->view('template/footer');        
-
-  }
-
- // Activer un utilisateur innactif
-  public function activer_user(){
-
-     $id_user = $this->uri->segment(3);   
-     if($this->admin_model->activer_user($id_user)){
-      $data['success'] = 'success';
-      $data['message'] = "UTILISATEUR ACTIVER AVEC SUCCESS";
-      $query=$this->admin_model->get_users_except();
-      $data['list'] = $query->result();
-
-      $this->load->view('template/header');
-        $this->load_admin_menu();
-      $this->load->view('adminsyst/users',$data);
-      $this->load->view('template/copyright');
-      $this->load->view('template/footer');        
-     }else{
-
-      $data['success'] = 'fail';
-      $data['message'] = "ERREUR D'ACTIVATION";
-      $query=$this->admin_model->get_users_except();
-      $data['list'] = $query->result();
-      $this->load->view('template/header');
-        $this->load_admin_menu();
-      $this->load->view('adminsyst/users',$data);
-      $this->load->view('template/copyright');
-      $this->load->view('template/footer');       
-
-     }
-  }
-
-  // Désactiver un utilisateur actif
-  public function desactiver_user(){
-
-    $id_user = $this->uri->segment(3);   
-    if($this->admin_model->desactiver_user($id_user)){
-      $data['success'] = 'success';
-      $data['message'] = "UTILISATEUR DEASACTIVER AVEC SUCCESS";
-      $query=$this->admin_model->get_users_except();
-      $data['list'] = $query->result();
-      $this->load->view('template/header');
-        $this->load_admin_menu();
-      $this->load->view('adminsyst/users',$data);
-      $this->load->view('template/copyright');
-      $this->load->view('template/footer');        
-    }else{
-      $data['success'] = 'fail';
-      $data['message'] = "ERREUR DE DESACTIVATION";
-      $query=$this->admin_model->get_users_except();
-      $data['list'] = $query->result();
-      $this->load->view('template/header');
-        $this->load_admin_menu();
-      $this->load->view('adminsyst/users',$data);
-      $this->load->view('template/copyright');
-      $this->load->view('template/footer');          
-    }    
-  }  
-
-
-  public function new_user(){
-
-    $this->load->library('encryption');
-    // Regles de validation 
-      $config = array(
-        array(
-          'field' => 'login',
-          'label' => 'Login',
-          'rules' => 'required|min_length[3]|is_unique[users.login_user]'
-        ),  
-        array(
-          'field' => 'password',
-          'label' => 'Le mot de passe',
-          'rules' => 'required|min_length[5]'
-        ),
-        array(
-          'field' => 'password1',
-          'label' => 'Le mot de passe',
-          'rules' => 'required|min_length[5]|matches[password]'
-        ),
-        array(
-          'field' => 'role',
-          'label' => 'La fonction',
-          'rules' => 'required'
-        )
+    public function etats(){
+      $data = array(
+        'year' =>$this->uri->segment(3),
+        'month' =>$this->uri->segment(4)
       );
-    $this->form_validation->set_rules($config);
-   
-    if($this->form_validation->run() == FALSE){
-        // Liste de categorie de produits
-        $data['list'] = $this->admin_model->get_users_role();
-        $data['success'] = FALSE; 
+      $prefs['template'] = '
+      {table_open}<table class="table" id="dataTable">{/table_open}
+
+      {heading_row_start}<tr>{/heading_row_start}
+
+      {heading_previous_cell}<th><a href="{previous_url}" class="btn btn-info btn-sm">Prev</a></th>{/heading_previous_cell}
+      {heading_title_cell}<th colspan="{colspan}"><span class="text-success">{heading}</span></th>{/heading_title_cell}
+      {heading_next_cell}<th><a href="{next_url}" class="btn btn-info btn-sm">Next</a></th>{/heading_next_cell}
+
+      {heading_row_end}</tr>{/heading_row_end}
+
+      {week_row_start}<tr>{/week_row_start}
+      {week_day_cell}<td>{week_day}</td>{/week_day_cell}
+      {week_row_end}</tr>{/week_row_end}
+      
+      {cal_row_start}<tr>{/cal_row_start}
+      {cal_cell_start}<td><span class="btn btn-light btn-sm">{/cal_cell_start} 
+      {cal_cell_start_today}<td class="today"><span class="btn btn-dark btn-sm">{/cal_cell_start_today}
+      {cal_cell_start_other}<td class="other-month">{/cal_cell_start_other}
+
+      {cal_cell_content}<a href="{content}">{day}</a> {/cal_cell_content}
+      {cal_cell_content_today}<div class="highlight"><a href="{content}" >{day}</a></div>{/cal_cell_content_today}
+
+      {cal_cell_no_content}{day}{/cal_cell_no_content}
+      {cal_cell_no_content_today}<div class="highlight">{day}</div>{/cal_cell_no_content_today}
+
+      {cal_cell_blank}&nbsp;{/cal_cell_blank}
+
+      {cal_cell_other}{day} {/cal_cel_other}
+
+      {cal_cell_end}</span></td>{/cal_cell_end}
+      {cal_cell_end_today}</span></td>{/cal_cell_end_today}
+      {cal_cell_end_other}</td>{/cal_cell_end_other}
+      {cal_row_end}</tr>{/cal_row_end}
+
+      {table_close}</table>{/table_close}';
+      $prefs['show_next_prev'] = TRUE;
+
+      $this->load->library('calendar', $prefs);
+
+      $this->load->view('template/header');
+        $this->load_admin_menu();
+      
+      $this->load->view('adminsyst/etats',$data);
+      //echo $this->calendar->generate($this->uri->segment(3), $this->uri->segment(4));
+      
+      $this->load->view('template/copyright');
+      $this->load->view('template/footer');
+
+    }
+    public function show_vente(){
+
+      $vente_date= $this->admin_model->get_etat_per_date('2018-10-28');
+      $output ='';
+      $output.='Etats de la vente de 2018-10-28';
+      $output .='<table class="table table-responsive"> 
+                <thead class="thead-dark">
+                  <tr>
+                    <th>Menu</th>
+                    <th>Montant</th>
+                  </tr>
+                </thead>
+              <tbody>';
+      $somme = 0;   
+      foreach($vente_date as $row){
+
+        $somme+= $row->montant;
+        $output .= '<tr> 
+          <td>'.$row->nom_cat.'</td>
+          <td>'.$row->montant.' Cfa </td>
+          </tr>';   
+      }
+      $output .= '<tr> 
+      <td>Total</td>
+      <td>'.$somme.'Cfa </td>
+      </tr>'; 
+      $output.='</tbody></table>';
+
+      $this->load->view('template/header');
+        $this->load_admin_menu();
+        echo $output;
+      $this->load->view('template/copyright');
+      $this->load->view('template/footer');      
+
+    }
+
+    public function  today_sel($date =''){
+
+      //$date = date('yyyy-mm-dd');
+      if(empty($date)){
+        $moment = date('Y-m-d');
+      }else{
+        $moment = $date;
+      }
+
+      $vente_date= $this->admin_model->get_etat_per_date($moment);
+      $output ='';
+      $output.='<h4 class="text-danger text-center font-italic"> <u>Etats de vente de '.$moment.' </u></h4>';
+      $output .='<table class="table table-responsive table-bordered"> 
+                <thead class="bg-secondary text-white">
+                  <tr>
+                    <th scope="col">Menu</th>
+                    <th scope="col">Montant</th>
+                  </tr>
+                </thead>
+              <tbody>';
+      $somme = 0;   
+      foreach($vente_date as $row){
+
+        $somme+= $row->montant;
+        $output .= '<tr> 
+          <td>'.$row->nom_cat.'</td>
+          <td>'.$row->montant.' Cfa </td>
+          </tr>';   
+      }
+      $output .= '<tr class="bg-danger text-white font-weight-bold "> 
+      <td >Total</td>
+      <td>'.$somme.' Cfa </td>
+      </tr>'; 
+      $output.='</tbody></table>';
+
+      if($somme == 0){
+        $output = '<h4 class="text-danger text-center font-italic"> Pas de vente à ce jour du '.$moment.' </h4>';
+      }
+      echo $output;
+
+    }
+    public function to_day_sel(){
+
+      $date = $_POST['date'];
+      $this->today_sel($date);
+
+    }
+    // Page des utilisateurs
+    public function  users (){
+      
+      $data['success'] = FALSE;
+      // $query = $this->admin_model->liste_users2(5,$this->uri->segment(3));
+      // $data['list'] = $query->result();
+      //Get full row of users
+      /*$query2 = $this->admin_model->liste_users();
+      $config['base_url'] = base_url('admin/plats/');
+      $config['total_rows'] = $query2->num_rows();
+      $this->pagination->initialize($config);*/
+      $query=$this->admin_model->get_users_except();
+      $data['list'] = $query->result();
+      $this->load->view('template/header');
+        $this->load_admin_menu();
+      $this->load->view('adminsyst/users',$data);
+      $this->load->view('template/copyright');
+      $this->load->view('template/footer');        
+
+    }
+
+  // Activer un utilisateur innactif
+    public function activer_user(){
+
+      $id_user = $this->uri->segment(3);   
+      if($this->admin_model->activer_user($id_user)){
+        $data['success'] = 'success';
+        $data['message'] = "UTILISATEUR ACTIVER AVEC SUCCESS";
+        $query=$this->admin_model->get_users_except();
+        $data['list'] = $query->result();
+
         $this->load->view('template/header');
           $this->load_admin_menu();
-
-        $this->load->view('adminsyst/new_user',$data);
-
+        $this->load->view('adminsyst/users',$data);
         $this->load->view('template/copyright');
-        $this->load->view('template/footer');
+        $this->load->view('template/footer');        
+      }else{
 
-    } 
-    else{  
-         // Cripter le mot de passe
-          $password_cripter = $this->encryption->encrypt($this->input->post('password'));
-           // insertion ok
+        $data['success'] = 'fail';
+        $data['message'] = "ERREUR D'ACTIVATION";
+        $query=$this->admin_model->get_users_except();
+        $data['list'] = $query->result();
+        $this->load->view('template/header');
+          $this->load_admin_menu();
+        $this->load->view('adminsyst/users',$data);
+        $this->load->view('template/copyright');
+        $this->load->view('template/footer');       
 
-         if($this->admin_model->add_user($password_cripter)){
-              // Liste des utilisateurs
-              $data['list'] = $this->admin_model->get_users_role();
-              $data['success'] = TRUE; 
-              $data['message'] =  "INSERTION SUCCESS ->  <span class='text-info'>". $this->input->post('login')."</span> ";
-              $this->load->view('template/header');
-                $this->load_admin_menu();
+      }
+    }
 
-              $this->load->view('adminsyst/new_user',$data);
-              $this->load->view('template/copyright');
-              $this->load->view('template/footer');
-          }
+    //Désactiver un utilisateur actif
+    public function desactiver_user(){
 
-        }
+      $id_user = $this->uri->segment(3);   
+      if($this->admin_model->desactiver_user($id_user)){
+        $data['success'] = 'success';
+        $data['message'] = "UTILISATEUR DEASACTIVER AVEC SUCCESS";
+        $query=$this->admin_model->get_users_except();
+        $data['list'] = $query->result();
+        $this->load->view('template/header');
+          $this->load_admin_menu();
+        $this->load->view('adminsyst/users',$data);
+        $this->load->view('template/copyright');
+        $this->load->view('template/footer');        
+      }else{
+        $data['success'] = 'fail';
+        $data['message'] = "ERREUR DE DESACTIVATION";
+        $query=$this->admin_model->get_users_except();
+        $data['list'] = $query->result();
+        $this->load->view('template/header');
+          $this->load_admin_menu();
+        $this->load->view('adminsyst/users',$data);
+        $this->load->view('template/copyright');
+        $this->load->view('template/footer');          
+      }    
+    }  
+
+    public function new_user(){
+
+      $this->load->library('encryption');
+      // Regles de validation 
+        $config = array(
+          array(
+            'field' => 'login',
+            'label' => 'Login',
+            'rules' => 'required|min_length[3]|is_unique[users.login_user]'
+          ),  
+          array(
+            'field' => 'password',
+            'label' => 'Le mot de passe',
+            'rules' => 'required|min_length[5]'
+          ),
+          array(
+            'field' => 'password1',
+            'label' => 'Le mot de passe',
+            'rules' => 'required|min_length[5]|matches[password]'
+          ),
+          array(
+            'field' => 'role',
+            'label' => 'La fonction',
+            'rules' => 'required'
+          )
+        );
+      $this->form_validation->set_rules($config);
     
-  }
+      if($this->form_validation->run() == FALSE){
+          // Liste de categorie de produits
+          $data['list'] = $this->admin_model->get_users_role();
+          $data['success'] = FALSE; 
+          $this->load->view('template/header');
+            $this->load_admin_menu();
 
-  /**
-   * Page de parametrage 
-   */
-  public function setting(){
+          $this->load->view('adminsyst/new_user',$data);
 
-      $data['success'] = FALSE;
-      $query=$this->admin_model->get_vanille_tab();
-      $data['list'] = $query->result();
-      $this->load->view('template/header');
-      $this->load_admin_menu();
-      $this->load->view('adminsyst/setting',$data);
-      $this->load->view('template/copyright');
-      $this->load->view('template/footer');         
-  }
-  /**
-   * Enregister une nouvelle table 
-   */
-  public function new_table(){
-    // Regles de validation 
-    $config = array(
-      array(
-        'field' => 'code',
-        'label' => 'Code de table',
-        'rules' => 'required|is_unique[van_table.code_table]'
-      )
-    );
-    $this->form_validation->set_rules($config);
- 
-    if($this->form_validation->run() == FALSE){
+          $this->load->view('template/copyright');
+          $this->load->view('template/footer');
 
-        $data['success'] = FALSE; 
+      } 
+      else{  
+          // Cripter le mot de passe
+            $password_cripter = $this->encryption->encrypt($this->input->post('password'));
+            // insertion ok
+
+          if($this->admin_model->add_user($password_cripter)){
+                // Liste des utilisateurs
+                $data['list'] = $this->admin_model->get_users_role();
+                $data['success'] = TRUE; 
+                $data['message'] =  "INSERTION SUCCESS ->  <span class='text-info'>". $this->input->post('login')."</span> ";
+                $this->load->view('template/header');
+                  $this->load_admin_menu();
+
+                $this->load->view('adminsyst/new_user',$data);
+                $this->load->view('template/copyright');
+                $this->load->view('template/footer');
+            }
+
+          }
+      
+    }
+    /**
+     * Page de parametrage 
+     */
+    public function setting(){
+
+        $data['success'] = FALSE;
+        $query=$this->admin_model->get_vanille_tab();
+        $data['list'] = $query->result();
         $this->load->view('template/header');
         $this->load_admin_menu();
-        $this->load->view('adminsyst/table_new',$data);
+        $this->load->view('adminsyst/setting',$data);
         $this->load->view('template/copyright');
-        $this->load->view('template/footer');
+        $this->load->view('template/footer');         
+    }
+    /**
+     * Enregister une nouvelle table 
+     */
+    public function new_table(){
+      // Regles de validation 
+      $config = array(
+        array(
+          'field' => 'code',
+          'label' => 'Code de table',
+          'rules' => 'required|is_unique[van_table.code_table]'
+        )
+      );
+      $this->form_validation->set_rules($config);
+  
+      if($this->form_validation->run() == FALSE){
 
-    } 
-    else{  
-          // insertion ok
-        if($this->admin_model->add_table()){
-              $data['success'] = TRUE; 
-              $data['message'] =  "INSERTION SUCCESS ->  <span class='text-info'>". $this->input->post('code')."</span> ";
-              $this->load->view('template/header');
-              $this->load_admin_menu();
-              $this->load->view('adminsyst/table_new',$data);
-              $this->load->view('template/copyright');
-              $this->load->view('template/footer');
+          $data['success'] = FALSE; 
+          $this->load->view('template/header');
+          $this->load_admin_menu();
+          $this->load->view('adminsyst/table_new',$data);
+          $this->load->view('template/copyright');
+          $this->load->view('template/footer');
+
+      } 
+      else{  
+            // insertion ok
+          if($this->admin_model->add_table()){
+                $data['success'] = TRUE; 
+                $data['message'] =  "INSERTION SUCCESS ->  <span class='text-info'>". $this->input->post('code')."</span> ";
+                $this->load->view('template/header');
+                $this->load_admin_menu();
+                $this->load->view('adminsyst/table_new',$data);
+                $this->load->view('template/copyright');
+                $this->load->view('template/footer');
+            }
           }
-        }
 
-    
+      
 
-  }
+    }
     /**
      * Suppression de table
      */
-     public function delete_table(){
-       
+    public function delete_table(){
+        
       $id_table = $this->uri->segment(3);
 
       if($this->admin_model->delete_table($id_table)){
@@ -1228,7 +1252,7 @@
         $this->load->view('adminsyst/setting',$data);
         $this->load->view('template/copyright');
         $this->load->view('template/footer');   
-       
+        
       }else{
 
         $data['success'] = 'fail';
@@ -1243,34 +1267,34 @@
           
       }
 
-     }
+    }
    /**
-    * Page de gestion des nouvelles commandes
-    */
+   * Page de gestion des nouvelles commandes
+   */
  
-  public function commande(){ 
-     //$this->plats_data(); 
-     $data['success'] = FALSE;
-     $query = $this->admin_model->liste_plats2(6,$this->uri->segment(3));
-     $data['list'] = $query->result();
+    public function commande(){ 
+      //$this->plats_data(); 
+      $data['success'] = FALSE;
+      $query = $this->admin_model->liste_plats2(6,$this->uri->segment(3));
+      $data['list'] = $query->result();
+      //Get full row of product
+      $query2 = $this->admin_model->liste_plats();
+      $config['per_page'] =6;
+      $config['base_url'] = base_url('admin/commande/');
+      $config['total_rows'] = $query2->num_rows();
+      $this->pagination->initialize($config);
+      
+      $this->load->view('template/header');
+      $this->load_admin_menu();
+      $this->load->view('adminsyst/commande',$data);
+      $this->load->view('template/copyright');
+      $this->load->view('template/footer');
 
-     //Get full row of product
-     $query2 = $this->admin_model->liste_plats();
-     $config['per_page'] =6;
-     $config['base_url'] = base_url('admin/commande/');
-     $config['total_rows'] = $query2->num_rows();
-     $this->pagination->initialize($config);
+    }
+    
 
-    $this->load->view('template/header');
-    $this->load_admin_menu();
-    $this->load->view('adminsyst/commande',$data);
-    $this->load->view('template/copyright');
-    $this->load->view('template/footer');
-
-  }
-
-  // Cette page servira de squelette de page
-  public function template(){ 
+   // Cette page servira de squelette de page
+   public function template(){ 
 
     $this->load->view('template/header');
     $this->load_admin_menu();
@@ -1278,8 +1302,96 @@
     $this->load->view('template/copyright');
     $this->load->view('template/footer');
 
-  }
+   }
+   /**
+    * Ajout de ligne commande
+    */
+   public function commande1(){ 
+    //$this->plats_data(); 
+    $data['success'] = FALSE;
+    $query = $this->admin_model->liste_plats2(6,$this->uri->segment(3));
+    $data['list'] = $query->result();
+    //Get full row of product
+    $query2 = $this->admin_model->liste_plats();
+    $config['per_page'] =6;
+    $config['full_tag_open'] = '<ul class="pagination" id="search_page_pagination">';
+    $config['full_tag_close'] = '</ul>';
+    $config['base_url'] = base_url('admin/commande1/');
+    $config['total_rows'] = $query2->num_rows();
+    $this->pagination->initialize($config);
+    //$this->load->view('template/header');
+    //$this->load_admin_menu();
+    $this->load->view('adminsyst/commande1',$data);
+    //$this->load->view('template/copyright');
+    //$this->load->view('template/footer');
 
+  }
+   //Validation de la commande du client 
+   public function set_commande(){
+
+    $data = array();
+    $data['list'] = $this->admin_model->get_commande_table();
+    $this->load->view('template/header');
+    $this->load_admin_menu();
+    $this->load->view('adminsyst/set_commande',$data);
+    $this->load->view('template/copyright');
+    $this->load->view('template/footer');
+
+   }
+
+  // Lister les commandes en cours
+  public function get_a_commande(){
+
+   $id_tab = $this->input->post('id_tab');
+   $code_tab = $this->input->post('code_tab');
+   //echo $id_tab;
+   $data = $this->admin_model->get_commande_by_id($id_tab);
+   //var_dump( $data->result());
+   $output ='';
+   $nb = 0;
+   $nb = $data->num_rows();
+   if($nb>0){
+
+    $output.='<table class="table table-bordered">
+      <thead>
+        <tr>
+            <th class="font-weight-bold"> Table Numero :<span class="text-danger">'.$code_tab.'</span>  </th>
+            <th colspan="3" class="text-right">    <button class="btn btn-danger" id="add_cmd" data-toggle="modal" data-target="#exampleModalLong"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
+        <tr>
+        <tr> 
+            <th>Nom</th>
+            <th>Quantité</th>  
+            <th>Prix</th>
+            <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>';
+      $total=0;
+      foreach($data->result() as $row){
+         $montant = $row->prix * $row->quantite;
+         $output.='<tr>
+             <td>'.$row->nom_plat.'</td>
+             <td>'.$row->quantite.'</td>
+             <td>'.$row->prix.'</td>
+             <td>'.$montant.'</td>
+           </tr>';
+         $total+=$montant;
+         }
+         $output.='<tr>
+             <td colspan="3" class="text-center font-weight-bold"> Total </td>
+             <td>'.$total.'</td>
+          </tr>
+           
+          <tr>
+          <td colspan="4" class="text-right"> <button class="btn btn-danger"> Enregister Vente <i class="fas fa-plus"></i> </button>  </td>
+          </tr> 
+        </tbody></table>';
+        
+    }else{
+      $output='';
+    }
+    echo $output;
+  }
 
 
 

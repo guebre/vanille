@@ -118,9 +118,35 @@ class MY_Model extends CI_Model {
        );
        return $this->db->insert('van_table',$data);   
     }
+
     //Obtenir la liste des tables
     public function get_table(){
-      return $this->db->get('van_table')->result();
+
+      $query = $this->db->query("SELECT * FROM van_table WHERE id NOT IN (SELECT id_table FROM commande)");
+      return $query->result();
+
+    }
+
+    //Liste des tables sur lesquelles il y a un client
+    public function get_commande_table(){
+      $query = $this->db->query("SELECT DISTINCT id_table ,code_table FROM van_table v INNER JOIN commande c ON v.id = c.id_table");
+      return $query;
+    }
+
+    //obtenir une commande en cours 
+    public function get_commande_by_id($id_table = NULL){
+
+        /*$query = $this->db->query("SELECT  id_table ,code_table FROM van_table v INNER JOIN commande c ON v.id = c.id_table");
+        return $query;*/
+        $this->db->select('p.nom_plat,c.prix,c.quantite,c.date_commande,c.id_table,id_commande');
+        $this->db->where('c.id_table=',$id_table);
+        $this->db->from('commande c ');
+        $this->db->join('plats p','p.id_plat = c.id_plat','left');
+        //$this->db->join('van_table vt','vt.id = c.id_table','left');
+        $query = $this->db->get();
+        return $query;
+
+        //return $this->db->get_where('commande',array('id_table' => $id_table));
     }
 
     /**
@@ -213,6 +239,16 @@ class MY_Model extends CI_Model {
                       ->update('users',$data);
     }
   
+    public function add_commande($commande = array()){
+
+      if(!empty($commande)){
+  
+         return $this->db->insert_batch('commande',$commande);
+
+      }
+      return FALSE;
+      
+    }
     public function add_vente($vente = array()){
 
       if(!empty($vente)){

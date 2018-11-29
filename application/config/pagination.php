@@ -1,6 +1,6 @@
 <?php 
 
-    $config['per_page'] = 5;
+    $config['per_page'] = 6;
     $config['attributes'] = array('class' => 'page-link');
 
     $config['full_tag_open'] = '<ul class="pagination">';
