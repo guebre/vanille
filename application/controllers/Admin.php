@@ -1322,6 +1322,7 @@
     //$this->load->view('template/header');
     //$this->load_admin_menu();
     $this->load->view('adminsyst/commande1',$data);
+    //echo $string;
     //$this->load->view('template/copyright');
     //$this->load->view('template/footer');
 
