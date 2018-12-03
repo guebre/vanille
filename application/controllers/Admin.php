@@ -790,10 +790,27 @@
     */
     public function debog(){
 
-        $data = $this->admin_model->get_table();
+       /* $data = $this->admin_model->get_table();
         foreach($data as $row){
         echo($row->id.'<br>');
-        }
+        }*/
+        $data = $this->admin_model->get_commande_by_id(8);
+        ///var_dump($data->result());
+        //$data1[]
+       // var_dump($data1);
+       $g_array = array();
+       foreach($data->result() as $row){
+          $g_array[] = $row;
+       }
+       //var_dump($g_array);
+       $this->session->set_userdata('current_cmd',$g_array);
+       //$session_data=$this->session->userdata('current_cmd');
+       //var_dump($session_data[0]);
+       
+       
+
+
+
     }
     private function vente_status($status = 0){
       $output = '';
@@ -1393,7 +1410,83 @@
     }
     echo $output;
   }
+  
 
+  private function a_table_data($id_tab){
+
+    $data = $this->admin_model->get_commande_by_id($id_tab);
+    //var_dump( $data->result());
+    $output ='';
+    $nb = 0;
+    $nb = $data->num_rows();
+    if($nb>0){
+ 
+     $output.='<table class="table table-bordered">
+       <thead>
+         <tr>
+             <th class="font-weight-bold"> Table Numero :<span class="text-danger">'.$code_tab.'</span>  </th>
+             <th colspan="3" class="text-right">    <button class="btn btn-danger" id="add_cmd" data-toggle="modal" data-target="#exampleModalLong"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
+         <tr>
+         <tr> 
+             <th>Nom</th>
+             <th>Quantité</th>  
+             <th>Prix</th>
+             <th>Total</th>
+         </tr>
+       </thead>
+       <tbody>';
+       $total=0;
+       foreach($data->result() as $row){
+          $montant = $row->prix * $row->quantite;
+          $output.='<tr>
+              <td>'.$row->nom_plat.'</td>
+              <td>'.$row->quantite.'</td>
+              <td>'.$row->prix.'</td>
+              <td>'.$montant.'</td>
+            </tr>';
+          $total+=$montant;
+          }
+          $output.='<tr>
+              <td colspan="3" class="text-center font-weight-bold"> Total </td>
+              <td>'.$total.'</td>
+           </tr>
+            
+           <tr>
+           <td colspan="4" class="text-right"> <button class="btn btn-danger"> Enregister Vente <i class="fas fa-plus"></i> </button>  </td>
+           </tr> 
+         </tbody></table>';
+         
+     }else{
+       $output='';
+     }
+     return $output; 
+  }
+  /**
+   * Fonction permettant d'ajouter une nouvelle ligne de produit ou udapte 
+   */
+  public function add_lign_commande(){
+     //var_dump($_POST);
+     $colums =  array(
+               'id_plat' => (int) $this->input->post('product_id'),
+               'id_table' =>(int)$this->input->post('code_tab')
+              );
+      $product =  array(
+        'id_plat' => (int) $this->input->post('product_id'),
+        'id_table' => (int) $this->input->post('code_tab'),
+        'quantite'=>  $this->input->post('quantity'),
+        'prix'=>  $this->input->post('prodcut_price'),
+        'id_user' => $this->session->userdata('id_user')
+        );
+        $response = $this->admin_model->add_commande_row($product,$colums);
+        
+        if($response['result']){
+               $code_tab = (int) $this->input->post('code_tab');
+               echo a_table_data($code_tab);
+        }else{
+            echo 'Error man';       
+        }
+
+  }
 
 
 }

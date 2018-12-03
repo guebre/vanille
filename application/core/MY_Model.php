@@ -135,7 +135,7 @@ class MY_Model extends CI_Model {
 
     //obtenir une commande en cours 
     public function get_commande_by_id($id_table = NULL){
-
+      
         /*$query = $this->db->query("SELECT  id_table ,code_table FROM van_table v INNER JOIN commande c ON v.id = c.id_table");
         return $query;*/
         $this->db->select('p.nom_plat,c.prix,c.quantite,c.date_commande,c.id_table,id_commande');
@@ -145,8 +145,48 @@ class MY_Model extends CI_Model {
         //$this->db->join('van_table vt','vt.id = c.id_table','left');
         $query = $this->db->get();
         return $query;
-
         //return $this->db->get_where('commande',array('id_table' => $id_table));
+    }
+
+    /**
+     * Ajouter une ligne de commande ou augmenter la quantite du produit
+     */
+    public function add_commande_row($product = array(),$colums = array()){
+        
+      if(in_commande($colums)){
+        // update product where $coloms data
+         $this->db->set('quantite','quantite+1',FALSE);
+         $this->db->where($colums);
+         $result = $this->db->update('commande');
+
+         $response ['action'] = 'update';
+         $response ['result'] = $response;
+
+         return $response;
+
+      }else{
+         // insertion new product 
+          $this->db->set($product);
+          return $this->db->insert('commande'); 
+          $response ['action'] = 'insertion';
+          $response ['result'] = $response;
+          return $response; 
+      }
+
+    }
+
+    //Si le produit est deja commandé ou pas
+    private function in_commande($colums = array()){
+
+       $where = array(
+            'id_plat' => $coloms['id_plat'],
+            'id_table'=> $coloms['id_table']
+       );
+       $query = $this->db->where('commande',$where);
+       if($query->num_rows() > 0 ){
+          return TRUE;
+       }
+       return FALSE;
     }
 
     /**

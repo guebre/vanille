@@ -267,61 +267,10 @@ $( document ).ready(function() {
         //modal.find('.modal-body input').val(recipient)
         //modal.find('.modal-body').load(base_url+'admin/commande1');
         modal.find('.modal-title').text('Ajout de produit à la table numero'+ code_tab);
-        
-
-        /*$('.add_cart1').click(function(){
-            alert('add_cart1');
-           let product_id = $(this).data("productid1");
-           let product_name = $(this).data("productname1");
-           let product_price = $(this).data("price1");
-           let quantity = $('#i_'+product_id).val();
-           //alert(quantity+'   '+product_id);
-    
-           if(quantity != '' && quantity > 0)
-           {
-               $.ajax({
-                   url:base_url+"admin/add_lign_commande",
-                   method:"POST",
-                   data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity},
-                   success:function(data)
-                   {
-                       alert("Produit a été ajouté à la commande");
-                       $('#row_commande').html(data);
-                       //$('#'+product_id).val('');
-                       //Activation du select des tables
-                       //$('#table_list').show();
-                   }
-               });
-           }
-           else
-           {
-             alert("Please entrer la quantité");
-           }
-        });*/
+      
 
       });
 
-     
-   
-
-    /*$('body').on('click','ul#search_page_pagination>li>a',function(ev){
-        //$('#exampleModalLong').modal('hide');
-        //$('.modal-body1').html();
-        ev.preventDefault();  // prevent default behaviour for anchor tag
-        let Pagination_url = $(this).attr('href'); // getting href of <a> tag
-        //$('.modal-body').load(Pagination_url);
-        
-        $.ajax({
-            url:Pagination_url,
-            type:'POST',
-            success:function(data){
-            //var $page_data = $(data);
-            //$('#exampleModalLong').modal('show');
-            $('.modal-body1').html(data);
-            // $('table').addClass('table');
-            }
-        });
-      });*/
 
     // Si le modal est visible sur l'ecran 
     $('#exampleModalLong').on('shown.bs.modal', function (e) {
@@ -350,6 +299,8 @@ $( document ).ready(function() {
                let product_name = $(this).data("productname1");
                let product_price = $(this).data("price1");
                let quantity = $('#i_'+product_id).val();
+               let code_tab = $('#table-cli').val();
+
                //alert(quantity+'   '+product_id);
         
                if(quantity != '' && quantity > 0)
@@ -357,16 +308,18 @@ $( document ).ready(function() {
                    $.ajax({
                        url:base_url+"admin/add_lign_commande",
                        method:"POST",
-                       data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity},
+                       data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity,code_tab:code_tab}, 
                        success:function(data)
                        {
                            alert("Produit a été ajouté à la commande");
                            $('#row_commande').html(data);
-                           //$('#'+product_id).val('');
+                           $('#i_'+product_id).val('');
                            //Activation du select des tables
                            //$('#table_list').show();
-                       }
+                       }    
                    });
+                    $('#exampleModalLong').modal('hide'); 
+                   //$('#exampleModalLong').modal('dispose'); 
                }
                else
                {
