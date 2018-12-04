@@ -1412,7 +1412,7 @@
   }
   
 
-  private function a_table_data($id_tab){
+  private function a_table_data($id_tab,$code_tab){
 
     $data = $this->admin_model->get_commande_by_id($id_tab);
     //var_dump( $data->result());
@@ -1468,20 +1468,23 @@
      //var_dump($_POST);
      $colums =  array(
                'id_plat' => (int) $this->input->post('product_id'),
-               'id_table' =>(int)$this->input->post('code_tab')
+               'id_table' =>(int)$this->input->post('id_tab')
               );
       $product =  array(
         'id_plat' => (int) $this->input->post('product_id'),
-        'id_table' => (int) $this->input->post('code_tab'),
+        'id_table' => (int) $this->input->post('id_tab'),
         'quantite'=>  $this->input->post('quantity'),
-        'prix'=>  $this->input->post('prodcut_price'),
+        'prix'=>  $this->input->post('product_price'),
         'id_user' => $this->session->userdata('id_user')
         );
         $response = $this->admin_model->add_commande_row($product,$colums);
         
         if($response['result']){
-               $code_tab = (int) $this->input->post('code_tab');
-               echo a_table_data($code_tab);
+
+               $id_tab = (int) $this->input->post('id_tab');
+               $code_tab = $this->input->post('code_tab');
+               
+               echo $this->a_table_data($id_tab,$code_tab);
         }else{
             echo 'Error man';       
         }

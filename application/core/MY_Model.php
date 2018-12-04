@@ -9,6 +9,7 @@ class MY_Model extends CI_Model {
     * Prend en paramèttre le mail de l'utilisateur
     * et retourne l'enregistrement correspondant
     */
+    
     public function does_user_exist($pseudo){
         
         return $this->db->get_where('users',array('login_user'=>$pseudo));               
@@ -153,36 +154,38 @@ class MY_Model extends CI_Model {
      */
     public function add_commande_row($product = array(),$colums = array()){
         
-      if(in_commande($colums)){
+      if($this->in_commande($colums)){
         // update product where $coloms data
          $this->db->set('quantite','quantite+1',FALSE);
          $this->db->where($colums);
          $result = $this->db->update('commande');
 
          $response ['action'] = 'update';
-         $response ['result'] = $response;
+         $response ['result'] = $result;
 
          return $response;
 
       }else{
          // insertion new product 
-          $this->db->set($product);
-          return $this->db->insert('commande'); 
+         $result = $this->db->set($product)
+                            ->insert('commande'); 
+
           $response ['action'] = 'insertion';
-          $response ['result'] = $response;
+          $response ['result'] =$result;
           return $response; 
       }
 
     }
 
     //Si le produit est deja commandé ou pas
-    private function in_commande($colums = array()){
+    public function in_commande($colums = array()){
 
        $where = array(
-            'id_plat' => $coloms['id_plat'],
-            'id_table'=> $coloms['id_table']
+            'id_plat' => $colums['id_plat'],
+            'id_table'=> $colums['id_table']
        );
-       $query = $this->db->where('commande',$where);
+        $query = $this->db->where($where)
+                          ->get('commande');
        if($query->num_rows() > 0 ){
           return TRUE;
        }

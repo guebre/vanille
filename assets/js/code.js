@@ -299,7 +299,8 @@ $( document ).ready(function() {
                let product_name = $(this).data("productname1");
                let product_price = $(this).data("price1");
                let quantity = $('#i_'+product_id).val();
-               let code_tab = $('#table-cli').val();
+               let id_tab = $('#table-cli').val();
+               let code_tab = $('#table-cli option:selected').text();
 
                //alert(quantity+'   '+product_id);
         
@@ -308,7 +309,7 @@ $( document ).ready(function() {
                    $.ajax({
                        url:base_url+"admin/add_lign_commande",
                        method:"POST",
-                       data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity,code_tab:code_tab}, 
+                       data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity,code_tab:code_tab,id_tab:id_tab}, 
                        success:function(data)
                        {
                            alert("Produit a été ajouté à la commande");
@@ -323,7 +324,8 @@ $( document ).ready(function() {
                }
                else
                {
-                 alert("Please entrer la quantité");
+                 alert("Please entrer la quantité111");
+                 $('#i_'+product_id).val('');
                }
          });
 
