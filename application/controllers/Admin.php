@@ -1486,7 +1486,7 @@
                
                echo $this->a_table_data($id_tab,$code_tab);
         }else{
-            echo 'Error man';       
+            echo 'error';       
         }
 
   }

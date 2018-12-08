@@ -220,7 +220,34 @@ $( document ).ready(function() {
       });
     
     //Rechecher une commande
-    $(document).on('click','#find_tab',function(event){
+   /* $(document).on('click','#find_tab',function(event){
+
+        event.preventDefault();
+        //obtenir l'id de la table
+        var id_tab = $('#table-cli').val();
+        var code_tab = $('#table-cli option:selected').text();
+        //alert(code_tab);
+        //alert(id_tab);
+        if(id_tab ==''){
+            alert('Veuillez choisir un numero de table');
+        }else{
+
+            $.ajax({
+                url:base_url+"admin/get_a_commande",
+                method:"POST",
+                data:{id_tab : id_tab,code_tab: code_tab},
+                success:function(data){
+                     $('#row_commande').html(data);
+                },
+                error:function(){
+                 
+                }
+            });
+        }
+
+    });*/
+      //Rechecher une commande
+    $("#find_tab").on('click',function(event){
 
         event.preventDefault();
         //obtenir l'id de la table
@@ -247,13 +274,15 @@ $( document ).ready(function() {
 
     });
 
+
    
   /**
    * Ajout de ligne commande
    **/ 
     $('.modal-body').load(base_url+'admin/commande1');
-    $('#exampleModalLong').on('show.bs.modal', function (event) {
 
+    $('#exampleModalLong').on('show.bs.modal', function (event) {
+       
         let id_tab = $('#table-cli').val();
         let code_tab = $('#table-cli option:selected').text();
         //var button = $(event.relatedTarget); // Button that triggered the modal
@@ -271,10 +300,47 @@ $( document ).ready(function() {
 
       });
 
+      $('body').on('click','.add_cart1',function(ev){
+        ev.preventDefault();
+       //alert('add_cart1');
+       let product_id = $(this).data("productid1");
+       let product_name = $(this).data("productname1");
+       let product_price = $(this).data("price1");
+       let quantity = $('#i_'+product_id).val();
+       let id_tab = $('#table-cli').val();
+       let code_tab = $('#table-cli option:selected').text();
 
+       //alert(quantity+'   '+product_id);
+
+       if(quantity != '' && quantity > 0)
+       {
+           $.ajax({
+               url:base_url+"admin/add_lign_commande",
+               method:"POST",
+               data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity,code_tab:code_tab,id_tab:id_tab}, 
+               success:function(data)
+               {
+                   if(data=='error'){
+                       alert("Une erreur s'est produite ");
+                   }else{
+                    alert("Produit a été ajouté à la commande");
+                    $('#row_commande').html(data);
+                    $('#i_'+product_id).val('');
+                    $('#exampleModalLong').modal('hide'); 
+                   }
+               }    
+           });        
+           //$('#exampleModalLong').modal('dispose'); 
+       }
+       else
+       {
+         alert("Please entrer la quantité");
+         $('#i_'+product_id).val('');
+       }
+       $(this).off('click');
+       });
     // Si le modal est visible sur l'ecran 
     $('#exampleModalLong').on('shown.bs.modal', function (e) {
-        
         $('body').on('click','ul#search_page_pagination>li>a',function(ev){
             ev.preventDefault();  // prevent default behaviour for anchor tag
             let Pagination_url = $(this).attr('href'); // getting href of <a> tag
@@ -292,42 +358,6 @@ $( document ).ready(function() {
 
         });
 
-        $('body').on('click','.add_cart1',function(){
-      
-               //alert('add_cart1');
-               let product_id = $(this).data("productid1");
-               let product_name = $(this).data("productname1");
-               let product_price = $(this).data("price1");
-               let quantity = $('#i_'+product_id).val();
-               let id_tab = $('#table-cli').val();
-               let code_tab = $('#table-cli option:selected').text();
-
-               //alert(quantity+'   '+product_id);
-        
-               if(quantity != '' && quantity > 0)
-               {
-                   $.ajax({
-                       url:base_url+"admin/add_lign_commande",
-                       method:"POST",
-                       data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity,code_tab:code_tab,id_tab:id_tab}, 
-                       success:function(data)
-                       {
-                           alert("Produit a été ajouté à la commande");
-                           $('#row_commande').html(data);
-                           $('#i_'+product_id).val('');
-                           //Activation du select des tables
-                           //$('#table_list').show();
-                       }    
-                   });
-                    $('#exampleModalLong').modal('hide'); 
-                   //$('#exampleModalLong').modal('dispose'); 
-               }
-               else
-               {
-                 alert("Please entrer la quantité111");
-                 $('#i_'+product_id).val('');
-               }
-         });
 
        
       
