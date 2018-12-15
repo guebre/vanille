@@ -218,34 +218,7 @@ $( document ).ready(function() {
     $( "#dataTable" ).on( "click", "td", function() {
         console.log( $( this ).text() );
       });
-    
-    //Rechecher une commande
-   /* $(document).on('click','#find_tab',function(event){
-
-        event.preventDefault();
-        //obtenir l'id de la table
-        var id_tab = $('#table-cli').val();
-        var code_tab = $('#table-cli option:selected').text();
-        //alert(code_tab);
-        //alert(id_tab);
-        if(id_tab ==''){
-            alert('Veuillez choisir un numero de table');
-        }else{
-
-            $.ajax({
-                url:base_url+"admin/get_a_commande",
-                method:"POST",
-                data:{id_tab : id_tab,code_tab: code_tab},
-                success:function(data){
-                     $('#row_commande').html(data);
-                },
-                error:function(){
-                 
-                }
-            });
-        }
-
-    });*/
+   
       //Rechecher une commande
     $("#find_tab").on('click',function(event){
 
@@ -362,6 +335,64 @@ $( document ).ready(function() {
        
       
     });
+
+    $('body').on('click','.row_cmd',function(event){
+       event.preventDefault();
+       let id_tab = $('#table-cli').val();
+       let code_tab = $('#table-cli option:selected').text();
+       let code_plat = $(this).data("row-plat");
+       $.ajax(
+         {
+           url:base_url+"admin/delete_lign_commande",
+           method:"POST",
+           data:{code_plat: code_plat,id_tab:id_tab,code_tab:code_tab},
+           success:function(data){
+
+                if(data=='error'){
+                    alert("Une erreur s'est produite ");
+                }else{
+                    alert("Produit a été de la commande ");
+                    $('#row_commande').html(data); 
+                }
+           },
+           error:function(){
+                alert("Une erreur lors de la suppression"); 
+           }
+
+         }
+       );
+       //alert('id du plat est: '+ code_plat);
+
+
+    });
    
+    // Enregister une vente 
+
+    $('body').on('click','#all_data',function(event){
+        event.preventDefault();
+        let row_tab = $(this).data('savev');
+        //alert(row_tab);
+        $.ajax({
+
+           // url:base_url+"admin/venteTotal",
+            url:base_url+"admin/debog",
+            method: "POST",
+            data:{ row_tab : row_tab},
+            success:function(data){
+
+                if(data=='error'){
+                    alert("Une erreur s'est produite ");
+                }else{
+                    alert("Vente effectuée avec success ");
+                    //$('#row_commande').html(data); 
+                }
+           },
+           error:function(){  
+                alert("Une erreur s'est produite "); 
+           }
+
+        });
+
+    });
   
 });

@@ -139,7 +139,7 @@ class MY_Model extends CI_Model {
       
         /*$query = $this->db->query("SELECT  id_table ,code_table FROM van_table v INNER JOIN commande c ON v.id = c.id_table");
         return $query;*/
-        $this->db->select('p.nom_plat,c.prix,c.quantite,c.date_commande,c.id_table,id_commande');
+        $this->db->select('p.id_plat,p.nom_plat,c.prix,c.quantite,c.date_commande,c.id_table,id_commande');
         $this->db->where('c.id_table=',$id_table);
         $this->db->from('commande c ');
         $this->db->join('plats p','p.id_plat = c.id_plat','left');
@@ -429,6 +429,24 @@ GROUP BY categorie.nom_cat;
     public function delete_menu($id){
 
       return $this->db->delete("categorie",array("id_cat" => $id));
+    }
+
+    /**
+     * Cette fonction supprime un enregistrement sur une table queconque 
+     */
+    public function delete_lign_commande($code_plat=NULL,$code_tab=NULL){
+
+      if(!empty($code_plat) AND !empty($code_tab)){
+        
+        $this->db->where('id_plat',$code_plat);
+        $this->db->where('id_table',$code_tab);
+        return $this->db->delete('commande');
+      }
+       return FALSE;
+    }
+    //Enregistrement d'une vente 
+    public function saveVente($id_table){
+              
     }
 
    

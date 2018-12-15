@@ -789,27 +789,24 @@
       * Fonction de Test
     */
     public function debog(){
-
-       /* $data = $this->admin_model->get_table();
-        foreach($data as $row){
-        echo($row->id.'<br>');
+       //$id_table = $this->input->post('row_table');
+       /* $this->db->where('id_table',3);
+        $this->db->select('id_plat,id_user,prix,quantite,date_commande');
+        $query=$this->db->get('commande');
+       
+        if($query->num_rows()>0){
+          $query1= $this->db->insert_batch('vente',$query->result());
+          echo $query1->nums_rows();
+        }
+        else{
+           echo "merde";
         }*/
-        $data = $this->admin_model->get_commande_by_id(8);
-        ///var_dump($data->result());
-        //$data1[]
-       // var_dump($data1);
-       $g_array = array();
-       foreach($data->result() as $row){
-          $g_array[] = $row;
-       }
-       //var_dump($g_array);
-       $this->session->set_userdata('current_cmd',$g_array);
-       //$session_data=$this->session->userdata('current_cmd');
-       //var_dump($session_data[0]);
-       
-       
-
-
+      // $query = $this->db->get_where('commande',array('id_table'=>3));
+      // var_dump($query);
+      $id_table = 3;
+      $sql = "INSERT INTO `vente` (`id_plat`,`id_user`,`prix`,`quantite`,`date_commande`) SELECT `id_plat`,`id_user`,`prix`,`quantite`,`date_commande` FROM `commande` WHERE id_table=$id_table";
+      $query = $this->db->query($sql);
+      echo $query->affected_row();  
 
     }
     private function vente_status($status = 0){
@@ -1362,56 +1359,10 @@
 
    $id_tab = $this->input->post('id_tab');
    $code_tab = $this->input->post('code_tab');
-   //echo $id_tab;
-   $data = $this->admin_model->get_commande_by_id($id_tab);
-   //var_dump( $data->result());
-   $output ='';
-   $nb = 0;
-   $nb = $data->num_rows();
-   if($nb>0){
-
-    $output.='<table class="table table-bordered">
-      <thead>
-        <tr>
-            <th class="font-weight-bold"> Table Numero :<span class="text-danger">'.$code_tab.'</span>  </th>
-            <th colspan="3" class="text-right">    <button class="btn btn-danger" id="add_cmd" data-toggle="modal" data-target="#exampleModalLong"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
-        <tr>
-        <tr> 
-            <th>Nom</th>
-            <th>Quantité</th>  
-            <th>Prix</th>
-            <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>';
-      $total=0;
-      foreach($data->result() as $row){
-         $montant = $row->prix * $row->quantite;
-         $output.='<tr>
-             <td>'.$row->nom_plat.'</td>
-             <td>'.$row->quantite.'</td>
-             <td>'.$row->prix.'</td>
-             <td>'.$montant.'</td>
-           </tr>';
-         $total+=$montant;
-         }
-         $output.='<tr>
-             <td colspan="3" class="text-center font-weight-bold"> Total </td>
-             <td>'.$total.'</td>
-          </tr>
-           
-          <tr>
-          <td colspan="4" class="text-right"> <button class="btn btn-danger"> Enregister Vente <i class="fas fa-plus"></i> </button>  </td>
-          </tr> 
-        </tbody></table>';
-        
-    }else{
-      $output='';
-    }
-    echo $output;
+   echo $this->a_table_data($id_tab,$code_tab);
+   
   }
   
-
   private function a_table_data($id_tab,$code_tab){
 
     $data = $this->admin_model->get_commande_by_id($id_tab);
@@ -1425,13 +1376,14 @@
        <thead>
          <tr>
              <th class="font-weight-bold"> Table Numero :<span class="text-danger">'.$code_tab.'</span>  </th>
-             <th colspan="3" class="text-right">    <button class="btn btn-danger" id="add_cmd" data-toggle="modal" data-target="#exampleModalLong"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
-         <tr>
+             <th colspan="4" class="text-right">    <button class="btn btn-danger" id="add_cmd" data-toggle="modal" data-target="#exampleModalLong"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
+         </tr>
          <tr> 
              <th>Nom</th>
              <th>Quantité</th>  
              <th>Prix</th>
              <th>Total</th>
+             <th>Action</th> 
          </tr>
        </thead>
        <tbody>';
@@ -1443,16 +1395,18 @@
               <td>'.$row->quantite.'</td>
               <td>'.$row->prix.'</td>
               <td>'.$montant.'</td>
+              <td> <button class="btn btn-danger row_cmd"  data-row-plat="'.$row->id_plat.'"> Supprimer  </button>   </td>
             </tr>';
           $total+=$montant;
           }
+
           $output.='<tr>
-              <td colspan="3" class="text-center font-weight-bold"> Total </td>
+              <td colspan="4" class="text-center font-weight-bold"> Total Gén </td>
               <td>'.$total.'</td>
            </tr>
             
            <tr>
-           <td colspan="4" class="text-right"> <button class="btn btn-danger"> Enregister Vente <i class="fas fa-plus"></i> </button>  </td>
+             <td colspan="5" class="text-right"> <button class="btn btn-danger"  id="all_data" data-savev="'.$id_tab.'"> Enregister Vente <i class="fa fa-plus"></i> </button>  </td>
            </tr> 
          </tbody></table>';
          
@@ -1461,6 +1415,7 @@
      }
      return $output; 
   }
+
   /**
    * Fonction permettant d'ajouter une nouvelle ligne de produit ou udapte 
    */
@@ -1491,8 +1446,37 @@
 
   }
 
+  public function delete_lign_commande(){
+
+    // Recuperation dde l'id du plat par ajax 
+      $code_plat =  (int)$this->input->post('code_plat'); 
+      $id_tab = (int) $this->input->post('id_tab');
+      $code_tab = $this->input->post('code_tab');
+
+      if($this->admin_model->delete_lign_commande($code_plat,$id_tab)){
+        echo $this->a_table_data($id_tab,$code_tab);
+      }else{
+          echo 'error';
+      }
+
+  }
+
+
+  public function  venteTotal(){
+
+   //récuperation de l'i de la table 
+   $id_table = (int)$this->input->post('row_tab');
+   //Enregisterement de la vente 
+    if($this->admin_model->saveVente($id_plat)){
+
+    }else{
+      echo 'error'; 
+    }
+
+  }
+
+
+
 
 }
-
-
 ?>
