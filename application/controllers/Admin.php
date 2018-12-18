@@ -791,39 +791,52 @@
     public function debog(){
         $plats = array();
         $update_plats = array();
+        $num_facture = $this->get_num_facture()+1;
         //$id_table = $this->input->post('row_table');
+        $id_table = 3;
         $this->db->select('id_plat,id_user,prix,quantite,date_commande');
-        $this->db->where('id_table',3);
+        $this->db->where('id_table',$id_table);
         $query=$this->db->get('commande');
         if($query->num_rows()>0){  //si on a un resultat satisfaisant
            foreach($query->result() as $row){
               $plat['id_plat'] = $row->id_plat;
-              //$plat['quantite'] = $row->quantite;
+              $plat['quantite'] = $row->quantite;
+              $plat['id_user'] = $row->id_user;
+              $plat['prix'] = $row->prix;
+              $plat['date_commande'] = $row->date_commande;
+              $plat['code_facture'] = $num_facture;
               // retoune les plats qui ont une quantité definie
               $update_data = $this->get_quantite_plat($row->id_plat,$row->quantite);
               if(!empty($update_data)){
                  $update_plats [] = $update_data;
               }
-              //$plats[] = $plat;
+              $plats[] = $plat;
            }
            //var_dump($update_plats);
            /**
             * Transformation de la commande d'une table en vente 
             * et génération d'un code de facture pour insertion dans la table vente
             */
-           $query1= $this->db->insert_batch('vente',$query->result());
-           if($query1->num_rows()>0){ // insertion ok 
+           $query1 = $this->db->insert_batch('vente',$plats);
+           //var_dump($query1);
+            if($query1){ // insertion ok 
                 /*
-                *On diminue la quantite de chanque produit et on 
+                *On diminue la quantite de chaque produit et on 
                 *vide la table commande en fonction de l'id de la table
                 */ 
-                $query2 = $this->db->update_batch('plat', $update_plats, 'id_plat');
-                if($query2->num_rows()>0){ // update ok
-
+                $query2 = $this->db->update_batch('plats', $update_plats, 'id_plat');
+                if($query2){ // update ok
+                    //Supprimer les commandes en fonction de l'id de la table  
+                       $this->db->where('id_table', $id_table);
+                       $this->db->delete('commande');
+                       echo 'success';     
                 }else{ // update pas ok
                      /**
                       *  Il faut vider l'insertion  dans la table vente selon code de facture 
                       */ 
+                       $this->db->where('code_facture', $num_facture);
+                       $this->db->delete('vente');
+                       echo 'error'; 
                 }
 
             }else{ // Erreur d'insertion 
@@ -832,14 +845,8 @@
 
         }
         else{ // Pas de resultat satisfaisant 
-           echo "merde";
+           echo "error";
         }
-      // $query = $this->db->get_where('commande',array('id_table'=>3));
-      // var_dump($query);
-      /*$id_table = 3;
-      $sql = "INSERT INTO `vente` (`id_plat`,`id_user`,`prix`,`quantite`,`date_commande`) SELECT `id_plat`,`id_user`,`prix`,`quantite`,`date_commande` FROM `commande` WHERE id_table=$id_table";
-      $query = $this->db->query($sql);
-      echo $query->affected_row();  */
 
     }
 
@@ -863,7 +870,17 @@
     }
 
     public function get_num_facture(){
-      
+
+        $this->db->select_max('code_facture');
+        $query = $this->db->get('vente');
+        $row = $query->row();
+        if(!isset($row)){
+            return 0; 
+        }else{
+            return  $row->code_facture;
+        }
+
+        //var_dump($row);
     }
     private function vente_status($status = 0){
       $output = '';
