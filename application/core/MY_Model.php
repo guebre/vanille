@@ -203,14 +203,23 @@ class MY_Model extends CI_Model {
     * Liste des produits
     */
     public function liste_plats(){
-         return $this->db->get_where("plats",array('statut'=>1)); 
+         //return $this->db->get_where("plats",array('statut'=>1)); 
         //SELECT * FROM plats INNER JOIN categorie ON plats.id_cat = categorie.id_cat
-    }
+        $this->db->select('*');
+        $this->db->where('statut',1);
+        $this->db->where('quantite >',0);
+        $this->db->or_where('quantite IS NULL',NULL,FALSE);
+        $this->db->from('plats');
+        $query = $this->db->get();
+        return $query;
+      }
 
     public function liste_plats2($limit,$start){
        
        $this->db->select('*');
        $this->db->where('statut',1);
+       $this->db->where('quantite >',0);
+       $this->db->or_where('quantite IS NULL',NULL,FALSE);
        $this->db->from('plats');
        $this->db->join('categorie', 'plats.id_cat = categorie.id_cat','left');
        $this->db->limit($limit,$start);
@@ -444,12 +453,120 @@ GROUP BY categorie.nom_cat;
       }
        return FALSE;
     }
+
     //Enregistrement d'une vente 
     public function saveVente($id_table){
-              
+
+      $plats = array();
+      $update_plats = array();
+      $num_facture = $this->get_num_facture()+1;
+     
+      $this->db->select('id_plat,id_user,prix,quantite,date_commande');
+      $this->db->where('id_table',$id_table);
+      $query=$this->db->get('commande');
+      if($query->num_rows()>0){  //si on a un resultat satisfaisant
+         foreach($query->result() as $row){
+            $plat['id_plat'] = $row->id_plat;
+            $plat['quantite'] = $row->quantite;
+            $plat['id_user'] = $row->id_user;
+            $plat['prix'] = $row->prix;
+            $plat['date_commande'] = $row->date_commande;
+            $plat['code_facture'] = $num_facture;
+            // retoune les plats qui ont une quantité definie
+            $update_data = $this->get_quantite_plat($row->id_plat,$row->quantite);
+            if(!empty($update_data)){
+               $update_plats [] = $update_data;
+            }
+            $plats[] = $plat;
+         }
+         //var_dump($update_plats);
+         /**
+          * Transformation de la commande d'une table en vente 
+          * et génération d'un code de facture pour insertion dans la table vente
+          */
+         $query1 = $this->db->insert_batch('vente',$plats);
+         //var_dump($query1);
+          if($query1){ // insertion ok 
+              /*
+              *On diminue la quantite de chaque produit et on 
+              *vide la table commande en fonction de l'id de la table
+              */ 
+              $query2 = $this->db->update_batch('plats', $update_plats, 'id_plat');
+              if($query2){ // update ok
+                  //Supprimer les commandes en fonction de l'id de la table  
+                     $this->db->where('id_table', $id_table);
+                     $this->db->delete('commande');
+                     return TRUE;  
+              }else{ // update pas ok
+                   /**
+                    *  Il faut vider l'insertion  dans la table vente selon code de facture 
+                    */ 
+                     $this->db->where('code_facture', $num_facture);
+                     $this->db->delete('vente');
+                     return FALSE;
+              }
+
+          }else{ // Erreur d'insertion 
+               echo  FALSE;
+          }
+
+      }
+      else{ // Pas de resultat satisfaisant 
+         return FALSE;
+      }
+
     }
 
-   
+     //Retourne les plats ayant une quantite differente de NULL
+    public function get_quantite_plat($id_plat,$quantite = 0){
+     
+      $this->db->select('quantite,id_plat');
+      $this->db->where('id_plat',$id_plat);
+      $this->db->where('quantite IS NOT NULL',NULL,FALSE);
+      $query=$this->db->get('plats');
+
+      if($query->num_rows()){ // si on un reslutat
+
+        $row = $query->row();
+        $update_data['id_plat'] = $row->id_plat;
+        $update_data['quantite'] = $row->quantite - $quantite; 
+        return $update_data;
+      }
+      return FALSE ;
+
+    }
+
+    public function get_num_facture(){
+      $this->db->select_max('code_facture');
+      $query = $this->db->get('vente');
+      $row = $query->row();
+      if(!isset($row)){
+          return 0; 
+      }else{
+          return  $row->code_facture;
+      }
+      //var_dump($row);
+    } 
+
+    public function check_quantite($data = array() ){
+
+      $this->db->select('quantite');
+      $this->db->where('id_plat',$data['id']);
+      $this->db->where('statut',1);
+      $this->db->where('quantite IS NOT NULL',NULL,FALSE);
+      $this->db->from('plats');
+      $query = $this->db->get();
+
+      if($query->num_rows() == 1){
+         $quantite = $query->row()->quantite;
+         if($quantite >= $data['qty']):
+           return TRUE;
+         else:
+           return FALSE;
+         endif;
+      }
+      return TRUE;  
+    }
 
 }
   

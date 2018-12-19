@@ -57,7 +57,7 @@ $( document ).ready(function() {
                 data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity},
                 success:function(data)
                 {
-                    alert("Produit  a été ajouté au panier");
+                    //alert("Produit  a été ajouté au panier");
                     $('#cart_details').html(data);
                     $('#'+product_id).val('');
                     //Activation du select des tables
@@ -89,6 +89,8 @@ $( document ).ready(function() {
 
     $('vente_status').html('');
 
+    $('button').css('cursor','pointer');
+
     $(document).on('click', '#save_vente', function(){
 
       var numbTab = $('#table_list').val();
@@ -98,7 +100,7 @@ $( document ).ready(function() {
 
       }else{
 
-        if(confirm("Voulez vous vraiment enregister la vente?"))
+        if(confirm("Voulez vous vraiment enregister la commande ?"))
         {
             $.ajax({
                 url:base_url+"admin/insert_vente1",
@@ -372,27 +374,31 @@ $( document ).ready(function() {
         event.preventDefault();
         let row_tab = $(this).data('savev');
         //alert(row_tab);
-        $.ajax({
+        if(confirm("Voulez vous enregistrer la vente? ")){
 
-           // url:base_url+"admin/venteTotal",
-            url:base_url+"admin/debog",
-            method: "POST",
-            data:{ row_tab : row_tab},
-            success:function(data){
-
-                if(data=='error'){
-                    alert("Une erreur s'est produite ");
-                }else{
-                    alert("Vente effectuée avec success ");
-                    //$('#row_commande').html(data); 
+            $.ajax({
+                // url:base_url+"admin/venteTotal",
+                 url:base_url+"admin/venteTotal",
+                 method: "POST",
+                 data:{ row_tab : row_tab},
+                 success:function(data){
+     
+                     if(data=='error'){
+                         alert("Une erreur s'est produite ");
+                     }else{
+                         alert("Vente effectuée avec success ");
+                         //$('#row_commande').html(data); 
+                     }
+                },
+                error:function(){  
+                     alert("Une erreur s'est produite "); 
                 }
-           },
-           error:function(){  
-                alert("Une erreur s'est produite "); 
-           }
+             });
 
-        });
-
+        }else{
+            return false;
+        }
+      
     });
   
 });

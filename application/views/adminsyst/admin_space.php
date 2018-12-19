@@ -34,7 +34,7 @@
                'alt' => 'image_cat',
                'class' =>'image_categorie'
             );
-            echo anchor('admin/commande',''.img($image_attributes).'<span class="font-weight-bold"> VENTES </span>',$attributes) ;
+            echo anchor('admin/commande',''.img($image_attributes).'<span class="font-weight-bold"> COMMANDE </span>',$attributes) ;
           ?>
          </div>
    </div>

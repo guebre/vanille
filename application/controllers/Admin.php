@@ -632,14 +632,33 @@
 
      public function add_shopping(){
 
-      $data = array(
+     /* $data = array(
         "id" => $_POST['product_id'],
         "name" => $_POST['product_name'],
         "qty" => $_POST['quantity'],
         "price" => $_POST['product_price']
+      ); */
+      $data = array(
+        "id" => $this->input->post('product_id'),
+        "name" => $this->input->post('product_name'),
+        "qty" => $this->input->post('quantity'),
+        "price" => $this->input->post('product_price')
       ); 
       $this->cart->insert($data);
-      echo $this->view();
+      //Si quantite_stock>=quantite_demande
+      if($this->admin_model->check_quantite($data)){
+         echo $this->view();
+        //echo 'success';
+
+      }else{
+         //echo '<div class="bg-danger"><h6 class="text-uppercase text-white">Stock du produit "'. $data['name'].'" est insuffisant </h6></p>';
+        echo '<div class="alert alert-danger" role="alert">
+               Stock du produit "'. $data['name'].'" est insuffisant
+             </div>';
+        echo $this->view();
+
+        }
+     
      }
     
      public function view(){
@@ -650,7 +669,7 @@
           <div class="col-md-12"> <h3 class="text-center">Panier d\'Achat </h3><br /> </div>
         </div>
         <div class="row">
-            <div class="col text-right"> <button type="button" id="clear_cart" class="btn btn-warning">Annuler Commande </button> </div> 
+            <div class="col text-right"> <button type="button" id="clear_cart" class="btn btn-warning" style="cursor:pointer">Annuler Commande </button> </div> 
         </div>
         <br>
         <div class="table-responsive">
@@ -672,7 +691,7 @@
                 <td>'.$items["qty"].'</td>
                 <td>'.$items["price"].'</td>
                 <td>'.$items["subtotal"].'</td>
-                <td><button type="button" name="remove" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
+                <td><button type="button" name="remove" style="cursor:pointer" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
               </tr>
               ';
             }
@@ -699,7 +718,7 @@
         </div>
           <div class="row">
              <div class="col text-right">
-                 <button id="save_vente" type="button"  class="btn btn-primary">Enregister Commande </button>
+                 <button style="cursor:pointer" id="save_vente" type="button"  class="btn btn-primary">Enregister Commande </button>
               </div>
           </div>';    
         }
@@ -716,7 +735,7 @@
       <h3>Panier d\'Achat </h3><br />
       <div class="table-responsive">
       <div align="right">
-        <button type="button" id="clear_cart" class="btn btn-warning">Annuler Vente </button>
+        <button  style="cursor:pointer" type="button" id="clear_cart" class="btn btn-warning">Annuler Vente </button>
       </div>
       <br />
       <table class="table table-bordered">
@@ -738,7 +757,7 @@
           <td>'.$items["qty"].'</td>
           <td>'.$items["price"].'</td>
           <td>'.$items["subtotal"].'</td>
-          <td><button type="button" name="remove" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
+          <td><button style="cursor:pointer" type="button" name="remove" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
         </tr>
         ';
       }
@@ -754,7 +773,7 @@
       {
         $output .='
         <div align="right">
-           <button id="save_vente" type="button"  class="btn btn-primary">Valider Vente </button>
+           <button style="cursor:pointer" id="save_vente" type="button"  class="btn btn-primary">Valider Vente </button>
         </div>';
       }
      
@@ -850,38 +869,9 @@
 
     }
 
-    //Retourne les plats ayant une quantite differente de NULL
-    public function get_quantite_plat($id_plat,$quantite = 0){
-     
-      $this->db->select('quantite,id_plat');
-      $this->db->where('id_plat',$id_plat);
-      $this->db->where('quantite IS NOT NULL',NULL,FALSE);
-      $query=$this->db->get('plats');
+   
 
-      if($query->num_rows()){ // si on un reslutat
-
-        $row = $query->row();
-        $update_data['id_plat'] = $row->id_plat;
-        $update_data['quantite'] = $row->quantite - $quantite; 
-        return $update_data;
-      }
-      return FALSE ;
-
-    }
-
-    public function get_num_facture(){
-
-        $this->db->select_max('code_facture');
-        $query = $this->db->get('vente');
-        $row = $query->row();
-        if(!isset($row)){
-            return 0; 
-        }else{
-            return  $row->code_facture;
-        }
-
-        //var_dump($row);
-    }
+    
     private function vente_status($status = 0){
       $output = '';
 
@@ -920,11 +910,10 @@
         $nb = $row->nb;
       }
       return $nb+1;
-
     }
     public function insert_vente1(){
       
-      $nb = $this->nb_vente();
+      //$nb = $this->nb_vente();
       $data = array(); //data contiendra d'une vente
       $data1 = array(); //data contiendra d'une vente
       foreach( $this->cart->contents() as $items ){
@@ -1268,6 +1257,7 @@
           }
       
     }
+
     /**
      * Page de parametrage 
      */
@@ -1449,7 +1439,7 @@
        <thead>
          <tr>
              <th class="font-weight-bold"> Table Numero :<span class="text-danger">'.$code_tab.'</span>  </th>
-             <th colspan="4" class="text-right">    <button class="btn btn-danger" id="add_cmd" data-toggle="modal" data-target="#exampleModalLong"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
+             <th colspan="4" class="text-right">    <button style="cursor:pointer" class="btn btn-danger" id="add_cmd" data-toggle="modal" data-target="#exampleModalLong"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
          </tr>
          <tr> 
              <th>Nom</th>
@@ -1468,7 +1458,7 @@
               <td>'.$row->quantite.'</td>
               <td>'.$row->prix.'</td>
               <td>'.$montant.'</td>
-              <td> <button class="btn btn-danger row_cmd"  data-row-plat="'.$row->id_plat.'"> Supprimer  </button>   </td>
+              <td> <button style="cursor:pointer" class="btn btn-danger row_cmd"  data-row-plat="'.$row->id_plat.'"> Supprimer  </button>   </td>
             </tr>';
           $total+=$montant;
           }
@@ -1479,7 +1469,7 @@
            </tr>
             
            <tr>
-             <td colspan="5" class="text-right"> <button class="btn btn-danger"  id="all_data" data-savev="'.$id_tab.'"> Enregister Vente <i class="fa fa-plus"></i> </button>  </td>
+             <td colspan="5" class="text-right"> <button style="cursor:pointer" class="btn btn-danger"  id="all_data" data-savev="'.$id_tab.'"> Enregister Vente <i class="fa fa-plus"></i> </button>  </td>
            </tr> 
          </tbody></table>';
          
@@ -1540,10 +1530,10 @@
    //récuperation de l'i de la table 
    $id_table = (int)$this->input->post('row_tab');
    //Enregisterement de la vente 
-    if($this->admin_model->saveVente($id_plat)){
-
+    if($this->admin_model->saveVente($id_table)){
+        echo 'success';   
     }else{
-      echo 'error'; 
+        echo 'error'; 
     }
 
   }

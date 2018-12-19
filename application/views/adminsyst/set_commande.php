@@ -4,7 +4,7 @@
         <div class="col-md-12">   <h4  class="text-center"> <u> Espace Vente </u>  </h4></div>
     </div>-->
    <div class="row">
-       <div class="col bg-danger text-white text-center"> <h4>ESPACE VENTE </h4> </div>
+       <div class="col bg-light text-danger text-center"> <h4>ESPACE VENTE </h4> </div>
    </div><br>
    <div class="container">
         <div class="row">
@@ -27,46 +27,7 @@
         </div><br>
         <div class="row">
             <div class="col">
-               <!--<table class="table table-bordered">
-                 <thead>
-                    <tr>
-                       <th class="font-weight-bold"> Table Numero :  </th>
-                       <th  colspan="3" class="text-right">    <button class="btn btn-danger"> Ajouter <i class="fas fa-plus"></i> </button>  </th>
-                    <tr>
-                    <tr> 
-                       <th>Nom</th>
-                       <th>Quantité</th>
-                       <th>Prix</th>
-                       <th>Total</th>
-                    </tr>
-
-                 </thead>
-                 <tbody>
-                    <tr>
-                       <td> Article1 </td>
-                       <td> 02</td>
-                       <td> 250</td>
-                       <td> 500 </td>
-                    </tr>
-                    <tr>
-                       <td> Article2 </td>
-                       <td> 1</td>
-                       <td> 800</td>
-                       <td> 800 </td>
-                    </tr>
-                    <tr>
-                       <td colspan="3" class="text-center font-weight-bold"> Total </td>
-                       <td> 1300 </td>
-                    </tr>
-                     
-                    <tr>
-                       <td colspan="4" class="text-right"> <button class="btn btn-danger"> Enregister Vente <i class="fas fa-plus"></i> </button>  </td>
-                      
-                    </tr>
-                     
-                 </tbody>
-                
-               </table>-->
+             
             </div>
         </div>
         <div class="row">  
@@ -95,7 +56,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <!--<button type="button" class="btn btn-primary">Save changes</button>-->
       </div>
     </div>
   </div>

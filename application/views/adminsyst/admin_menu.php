@@ -13,6 +13,9 @@
             <button type="button" class="btn btn-light ml-auto">
                alerts <a href="<?php echo base_url('admin/appro_seuil'); ?>" class="badge badge-danger"><?php echo $list->num_rows() ;?> </a>
             </button>
+
+             <button type="button" class="btn btn-light ml-auto"> <?php echo anchor("admin/set_commande","Vente") ; ?> </button>
+
             <ul class="navbar-nav ml-auto mr-auto">
                 <li class="nav-item dropdown ">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -6,45 +6,14 @@
     <div class="row">
          <div class="col" id="vente_status">  </div>
     </div>
-
     <div class="row">
-            <div class="col-9">
-                <?php
-                    $attribute2 = array(
-                    'class' => 'list-group-item list-group-item-action active',
-                    'role' => 'button'
-                    );
-                    $image_attribute_liste = array(
-                        'src' => 'assets/images/New-file-icon.png',
-                        'alt' => 'image_cat',
-                        'class' =>''
-                    );
-                    echo anchor('#',''.img($image_attribute_liste).'<span class="font-weight-bold"> Espace commande </span>',$attribute2) ;
-                ?>
-            </div>
-            <div class="col-3">
-                <?php
-                    $attributes = array(
-                        'class' => 'list-group-item list-group-item-action',
-                        'role' => 'button'
-                    );
-                $image_attributes = array(
-                    'src' => 'assets/images/Food-List-Ingredients-icon.png',
-                    'alt' => 'image_cat',
-                    'class' =>''
-                    );
-
-                echo anchor('admin/shopping',''.img($image_attributes).'<span class="font-weight-bold"> Voir Commandes en cours .. </span>',$attributes) ;
-                ?>
-                
-            </div>
-    </div>
-    <br>
+       <div class="col bg-light text-danger text-center"> <h4>ESPACE COMMANDE </h4> </div>
+   </div><br>
     <div class="row">
-            <div class="col-6">
+            <div class="col-md-6">
                 <!--<h3 class="text-center text-success" >Espace vente</h3><br />-->
                 <?php  echo $this->pagination->create_links(); ?>
-                    <div class="table-responsive row">
+                    <div class="row">
                         <?php
                         foreach($list as  $row)
                         {
@@ -60,7 +29,7 @@
                         ?> 
                     </div>
             </div>           
-            <div class="col-lg-6 col-md-6">
+            <div class="col-md-6">
                 
                 <div id="cart_details">
 
