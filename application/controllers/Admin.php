@@ -86,7 +86,8 @@
       public function category(){
 
         $data['success'] = FALSE;
-        $query = $this->db->get('categorie','5',$this->uri->segment(3));
+        $query = $this->admin_model->get_category('5',$this->uri->segment(3));
+        //$query = $this->db->get('categorie','5',$this->uri->segment(3));
         $config['base_url'] = base_url().'admin/category/';
         $query2 = $this->admin_model->list_menu();
         $config['total_rows'] = $query2->num_rows();
@@ -630,36 +631,43 @@
       
      }
 
-     public function add_shopping(){
+    public function add_shopping(){
 
-     /* $data = array(
-        "id" => $_POST['product_id'],
-        "name" => $_POST['product_name'],
-        "qty" => $_POST['quantity'],
-        "price" => $_POST['product_price']
-      ); */
       $data = array(
         "id" => $this->input->post('product_id'),
         "name" => $this->input->post('product_name'),
         "qty" => $this->input->post('quantity'),
         "price" => $this->input->post('product_price')
       ); 
-      $this->cart->insert($data);
+      
       //Si quantite_stock>=quantite_demande
       if($this->admin_model->check_quantite($data)){
+        $this->cart->insert($data);
+
+        echo '<div class="alert alert-success" role="alert">
+         Le produit "'. $data['name'].'" a été ajouté à la commande
+         </div>';
          echo $this->view();
         //echo 'success';
 
-      }else{
-         //echo '<div class="bg-danger"><h6 class="text-uppercase text-white">Stock du produit "'. $data['name'].'" est insuffisant </h6></p>';
-        echo '<div class="alert alert-danger" role="alert">
-               Stock du produit "'. $data['name'].'" est insuffisant
-             </div>';
-        echo $this->view();
+      }else{ // soit qty est null ou qty<qte_ask
+          //$this->cart->insert($data);
+          //echo '<div class="bg-danger"><h6 class="text-uppercase text-white">Stock du produit "'. $data['name'].'" est insuffisant </h6></p>';
+          echo '<div class="alert alert-danger" role="alert">
+                Stock du produit "'. $data['name'].'" est insuffisant
+              </div>';
+          echo $this->view();
 
-        }
+      }
      
-     }
+    
+    }
+
+    public function load(){
+         echo $this->view();
+
+    }
+    
     
      public function view(){
 
@@ -729,7 +737,8 @@
         return $output;
      }
 
-    public function default_view(){
+    
+     public function default_view(){
       $output = '';
       $output .= '
       <h3>Panier d\'Achat </h3><br />
@@ -784,12 +793,81 @@
       }
       return $output;
     }
+ 
+     
+    public function view1(){
+ 
+         $output = '';
+         $output .= '
+         <div class="row">
+           <div class="col-md-12"> <h3 class="text-center">Panier d\'Achat </h3><br /> </div>
+         </div>
+         <div class="row">
+             <div class="col text-right"> <button type="button" id="clear_cart" class="btn btn-warning" style="cursor:pointer">Annuler Commande </button> </div> 
+         </div>
+         <br>
+         <div class="table-responsive">
+           <table class="table table-bordered">
+             <tr>
+             <th width="40%">Nom</th>
+             <th width="15%">Quantit&eacute;</th>
+             <th width="15%">Prix</th>
+             <th width="15%">Total</th>
+             <th width="15%">Action</th>
+             </tr>';
+             $count = 0;
+             foreach($this->cart->contents() as $items)
+             {
+               $count++;
+               $output .= '
+               <tr> 
+                 <td>'.$items["name"].'</td>
+                 <td>'.$items["qty"].'</td>
+                 <td>'.$items["price"].'</td>
+                 <td>'.$items["subtotal"].'</td>
+                 <td><button type="button" name="remove" style="cursor:pointer" class="btn btn-danger btn-xs remove_inventory" id="'.$items["rowid"].'">Supprimer</button></td>
+               </tr>
+               ';
+             }
+             $output .= '
+             <tr>
+               <td colspan="4" align="right">Total</td>
+               <td>'.$this->cart->total().'</td>
+             </tr>
+             </table>
+         </div>'; 
+         if($count != 0)
+         {
+           $output .='
+           <div class="row">
+           <div class="col text-right"> 
+             <select class="form-control" name="cmd_table" id="table_list"> 
+                 <option value=""> CHOISIR LA TABLE DU CLIENT </option>';
+                 $data = $this->admin_model->get_table();
+                 foreach($data as $item ){ 
+                     $output.='<option value='.$item->id.'>'.$item->code_table.'</option>';
+                   }
+             $output.='</select> <br>
+           </div>
+         </div>
+           <div class="row">
+              <div class="col text-right">
+                  <button style="cursor:pointer" id="save_vente" type="button"  class="btn btn-primary">Enregister Commande </button>
+               </div>
+           </div>';    
+         }
+         if($count == 0)
+         {
+            $output = '<h3 align="center">Panier vide </h3>';
+         }
+         return $output;
+      }
+ 
+     
+   
 
-    public  function load(){
-      echo $this->view();
-    }
-
-    public function remove(){
+    
+      public function remove(){
 
         $row_id = $_POST["row_id"];
         $data = array(
@@ -808,65 +886,14 @@
       * Fonction de Test
     */
     public function debog(){
-        $plats = array();
-        $update_plats = array();
-        $num_facture = $this->get_num_facture()+1;
-        //$id_table = $this->input->post('row_table');
-        $id_table = 3;
-        $this->db->select('id_plat,id_user,prix,quantite,date_commande');
-        $this->db->where('id_table',$id_table);
-        $query=$this->db->get('commande');
-        if($query->num_rows()>0){  //si on a un resultat satisfaisant
-           foreach($query->result() as $row){
-              $plat['id_plat'] = $row->id_plat;
-              $plat['quantite'] = $row->quantite;
-              $plat['id_user'] = $row->id_user;
-              $plat['prix'] = $row->prix;
-              $plat['date_commande'] = $row->date_commande;
-              $plat['code_facture'] = $num_facture;
-              // retoune les plats qui ont une quantité definie
-              $update_data = $this->get_quantite_plat($row->id_plat,$row->quantite);
-              if(!empty($update_data)){
-                 $update_plats [] = $update_data;
-              }
-              $plats[] = $plat;
-           }
-           //var_dump($update_plats);
-           /**
-            * Transformation de la commande d'une table en vente 
-            * et génération d'un code de facture pour insertion dans la table vente
-            */
-           $query1 = $this->db->insert_batch('vente',$plats);
-           //var_dump($query1);
-            if($query1){ // insertion ok 
-                /*
-                *On diminue la quantite de chaque produit et on 
-                *vide la table commande en fonction de l'id de la table
-                */ 
-                $query2 = $this->db->update_batch('plats', $update_plats, 'id_plat');
-                if($query2){ // update ok
-                    //Supprimer les commandes en fonction de l'id de la table  
-                       $this->db->where('id_table', $id_table);
-                       $this->db->delete('commande');
-                       echo 'success';     
-                }else{ // update pas ok
-                     /**
-                      *  Il faut vider l'insertion  dans la table vente selon code de facture 
-                      */ 
-                       $this->db->where('code_facture', $num_facture);
-                       $this->db->delete('vente');
-                       echo 'error'; 
-                }
+      
+      $data = array(
 
-            }else{ // Erreur d'insertion 
-                 echo  'error';
-            }
-
-        }
-        else{ // Pas de resultat satisfaisant 
-           echo "error";
-        }
-
+        'id' => $this->uri->segment(3),
+        'qty' =>1
+      );
+      echo  $this->admin_model->check_quantite1($data);
+    
     }
 
    
@@ -879,16 +906,15 @@
         $output .= '';
       }elseif($status == 1){
           $output .= '<!--<div class="alert alert-success" role="alert">
-        La vente  a été éffectué   <a href="'.base_url('admin/etats').'" class="alert-link"> Etat de ventes </a>. 
+        La vente  a été éffectué   <a href="'.base_url('admin/set_commande').'" class="alert-link">Vente </a>. 
           </div>-->';
 
           $output .= '<div class="alert alert alert-success alert-dismissible fade show" role="alert">
-          La vente  a été éffectué   <a href="'.base_url('admin/etats').'" class="alert-link"> Etat de ventes </a>.
+          La vente  a été éffectué   <a href="'.base_url('admin/set_commande').'" class="alert-link"> Vente  </a>.
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>';
-
       }elseif($status == 2) {
         $output .='<!--<div class="alert alert-danger" role="alert">
           Nous ne pouvons pas prendre en compte votre vente suite à  erreur.  
@@ -910,6 +936,43 @@
         $nb = $row->nb;
       }
       return $nb+1;
+    }
+    public function insert_vente2(){
+
+      //$nb = $this->nb_vente();
+      $list_plats = array(); //Liste des plats 
+      $update_plats = array(); 
+      $id_table = $this->input->post('id_table');
+      foreach($this->cart->contents() as $items ){
+
+        $row = array (
+          'id_plat' => $items["id"],
+          'id_user' => $this->session->userdata('id_user'),
+          'prix'    => $items["subtotal"],
+          'quantite'    => $items["qty"],
+          'id_table' =>$id_table
+      );
+      // retoune les plats qui ont une quantité definie
+      $update_data = $this->admin_model->get_quantite_plat($row['id_plat'],$row['quantite']);
+      if(!empty($update_data)){
+         $update_plats [] = $update_data;
+      }
+         $list_plats [] = $row;
+       
+      }
+      //var_dump($data);
+      // insertion dans la base 
+      if($this->admin_model->add_commande1($list_plats,$update_plats,$id_table) > 0 ){ //insertion ok 
+        
+        //Diminuer la quantité de chaque produit ici 
+          $this->cart->destroy();
+          echo $this->view();
+          echo $this->vente_status(1);
+
+      }else{
+          echo  $this->vente_status(2);
+      }
+
     }
     public function insert_vente1(){
       
@@ -1495,17 +1558,30 @@
         'prix'=>  $this->input->post('product_price'),
         'id_user' => $this->session->userdata('id_user')
         );
-        $response = $this->admin_model->add_commande_row($product,$colums);
-        
-        if($response['result']){
+        $data =  array(
+          'id' => (int) $this->input->post('product_id'),
+          'qty'=>  $this->input->post('quantity'),
+          );
+        //Si quantite_stock>=quantite_demande
+      if($this->admin_model->check_quantite($data)){
 
-               $id_tab = (int) $this->input->post('id_tab');
-               $code_tab = $this->input->post('code_tab');
-               
-               echo $this->a_table_data($id_tab,$code_tab);
-        }else{
-            echo 'error';       
-        }
+            $response = $this->admin_model->add_commande_row($product,$colums);
+            
+            if($response['result']){
+
+                  $id_tab = (int) $this->input->post('id_tab');
+                  $code_tab = $this->input->post('code_tab');
+                  
+                  echo $this->a_table_data($id_tab,$code_tab);
+            }else{
+                echo 'error';       
+            }
+       
+      }else{
+          
+        echo 'error_qty';     
+      }
+        
 
   }
 

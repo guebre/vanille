@@ -20,7 +20,7 @@ class MY_Model extends CI_Model {
       $data = array( 'loginEnd' =>$date,'loginAt' =>$this->session->userdata('logAt'));
       $this->db->update('users',$data,array('id_user' => $this->session->userdata('id_user')));
     }
-   /**************************************************************** */
+    /**************************************************************** */
     /**
     * Ajouter un plat  
     */
@@ -113,6 +113,7 @@ class MY_Model extends CI_Model {
      * Enregister une nouvelle table dans le restaurant
      */
     public function add_table(){
+
        $data = array(
           'code_table' => $this->input->post('code')
           //'nb_place' =>$this->input->post('nbr_place')
@@ -209,6 +210,7 @@ class MY_Model extends CI_Model {
         $this->db->where('statut',1);
         $this->db->where('quantite >',0);
         $this->db->or_where('quantite IS NULL',NULL,FALSE);
+        $this->db->order_by('nom_plat ASC');
         $this->db->from('plats');
         $query = $this->db->get();
         return $query;
@@ -222,6 +224,7 @@ class MY_Model extends CI_Model {
        $this->db->or_where('quantite IS NULL',NULL,FALSE);
        $this->db->from('plats');
        $this->db->join('categorie', 'plats.id_cat = categorie.id_cat','left');
+       $this->db->order_by('nom_plat');
        $this->db->limit($limit,$start);
        $query = $this->db->get();
        return $query;
@@ -301,6 +304,7 @@ class MY_Model extends CI_Model {
       return FALSE;
       
     }
+   
     public function add_vente($vente = array()){
 
       if(!empty($vente)){
@@ -429,7 +433,8 @@ GROUP BY categorie.nom_cat;
 
     public function list_menu(){
 
-      return $this->db->get("categorie"); 
+      return $this->db->order_by('nom_cat ASC')
+                      ->get("categorie"); 
    }
 
    /**
@@ -525,15 +530,13 @@ GROUP BY categorie.nom_cat;
       $this->db->where('quantite IS NOT NULL',NULL,FALSE);
       $query=$this->db->get('plats');
 
-      if($query->num_rows()){ // si on un reslutat
-
+      if($query->num_rows()){ // si on a  un resultat
         $row = $query->row();
         $update_data['id_plat'] = $row->id_plat;
         $update_data['quantite'] = $row->quantite - $quantite; 
         return $update_data;
       }
       return FALSE ;
-
     }
 
     public function get_num_facture(){
@@ -548,7 +551,7 @@ GROUP BY categorie.nom_cat;
       //var_dump($row);
     } 
 
-    public function check_quantite($data = array() ){
+   /* public function check_quantite($data = array() ){
 
       $this->db->select('quantite');
       $this->db->where('id_plat',$data['id']);
@@ -565,9 +568,69 @@ GROUP BY categorie.nom_cat;
            return FALSE;
          endif;
       }
-      return TRUE;  
+      return FALSE;  
+    }*/
+    public function check_quantite($data = array() ){
+
+      $this->db->select('quantite');
+      $this->db->where('id_plat',$data['id']);
+      $this->db->where('statut',1);
+      $this->db->where('quantite IS NOT NULL',NULL,FALSE);
+      $this->db->from('plats');
+      $query = $this->db->get();
+
+      if($query->num_rows() == 1){
+
+         $quantite = $query->row()->quantite;
+         if($quantite >= $data['qty']):
+            return TRUE ;  // on retourn 1 
+         else:
+            return FALSE ;
+         endif;
+      }else{ // quantite IS NULL on retoune 1 
+         return  TRUE;
+      }
+
     }
 
+    public function add_commande1($list_plats = array(),$update_plats = array(),$id_table){
+
+      if(!empty($list_plats)){
+  
+          $query = $this->db->insert_batch('commande',$list_plats);
+          if($query){ // insertion ok 
+            /*
+            *On diminue la quantite de chaque produit
+            */ 
+            $query1 = $this->db->update_batch('plats', $update_plats, 'id_plat');
+            if($query1){ // update ok
+                   return TRUE;  
+            }else{ // update pas ok
+                 /**
+                  *  Il faut vider l'insertion  dans la table commande selon code de la table 
+                  */ 
+                   $this->db->where('id_table',$id_table);
+                   $this->db->delete('commande');
+                   return FALSE;
+            }
+
+        }else{ // Erreur d'insertion 
+             return  FALSE;
+        }
+
+      }
+      return FALSE;
+      
+    }
+    
+    public function get_category($length,$url){
+
+       $this->db->select('*');
+       $this->db->order_by('nom_cat ASC');
+       $query = $this->db->get('categorie',$length,$url);
+       return $query;
+
+    }
 }
   
 ?> 

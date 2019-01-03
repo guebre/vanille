@@ -103,7 +103,8 @@ $( document ).ready(function() {
         if(confirm("Voulez vous vraiment enregister la commande ?"))
         {
             $.ajax({
-                url:base_url+"admin/insert_vente1",
+                //url:base_url+"admin/insert_vente1",
+                url:base_url+"admin/insert_vente2",
                 method:"POST",
                 data:{id_table: numbTab},
                 success:function(data)
@@ -294,9 +295,13 @@ $( document ).ready(function() {
                method:"POST",
                data:{product_id:product_id, product_name:product_name, product_price:product_price, quantity:quantity,code_tab:code_tab,id_tab:id_tab}, 
                success:function(data)
-               {
+               {   
+                   if(data=='error_qty'){
+                      alert("Quantité insuffisant");
+                   }
+
                    if(data=='error'){
-                       alert("Une erreur s'est produite ");
+                       alert("Une erreur s'est produite");
                    }else{
                     alert("Produit a été ajouté à la commande");
                     $('#row_commande').html(data);
