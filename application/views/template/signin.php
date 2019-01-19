@@ -19,7 +19,7 @@
         </div>
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <label for="usrname" class="col-form-label"><span class="signin-label">Login : </span></label>
+                <label for="usrname" class="col-form-label"><span class="signin-label">Email : </span></label>
                 <input name="usrname" type="text" class="form-control"  id="usrname" placeholder="login" > 
                 <?php echo form_error('usrname'); ?>  
             </div>    

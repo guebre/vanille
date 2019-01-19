@@ -10,16 +10,17 @@ class MY_Model extends CI_Model {
     * et retourne l'enregistrement correspondant
     */
     
-    public function does_user_exist($pseudo){
-        
+    public function does_user_exist($pseudo){   
         return $this->db->get_where('users',array('login_user'=>$pseudo));               
     }
 
     public function logout(){
+      
       $date = date("Y-m-d H:i:s");
       $data = array( 'loginEnd' =>$date,'loginAt' =>$this->session->userdata('logAt'));
       $this->db->update('users',$data,array('id_user' => $this->session->userdata('id_user')));
     }
+
     /**************************************************************** */
     /**
     * Ajouter un plat  

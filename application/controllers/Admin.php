@@ -27,11 +27,13 @@
       }
 
       public function index(){
+
         $this->load->view('template/header');
         $this->load_admin_menu();
         $this->load->view('adminsyst/admin_space');
         $this->load->view('template/copyright');
         $this->load->view('template/footer');
+        
       }
       
       public function appro_seuil(){
