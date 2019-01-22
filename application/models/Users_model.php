@@ -26,9 +26,52 @@ class Users_model extends CI_Model{
     /**
      * update user
      */
+    public function process_update_user($id,$data){
+       $this->db->where('id_user',$id);
+       if($this->db->update('users',$data)){
+           return true;
+       } else {
+           return false;
+       }
+    }
 
+    /**
+     * user details
+     */
+    public function get_user_details($id){
+         $this->db->where('id_user',$id);
+         $result = $this->db->get('users');
+         
+         if($result){
+             return $result;
+         } else {
+             return false;
+         }
+    }
 
+    /** 
+     * User details by email
+     */
+    public function get_user_details_by_email($email){
+         $this->db->where('mail_user',$email);
+         $result = $this->db->get('users');
+         if($result){
+            return $result;
+         } else {
+            return false;
+         }
+    }
 
+    /**
+     * Delete a user
+     */
+    public function delte_user($id){
+        if($this->db->delete('users',array('id_user',$id))){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     /**
      * Création d'une utilisateurs
@@ -39,7 +82,7 @@ class Users_model extends CI_Model{
      * vérification du login de l'utilisateur
     **/
 
-    public function get($param = array() ){
+    public function get(array $params ){
        
        if($param){
 
@@ -52,46 +95,34 @@ class Users_model extends CI_Model{
     }
     
     /**
-     * Enregistrer l'heure a laquelle on se connecter
+     * Enregistrer l'heure à laquelle l'utilisateur se connecte au système
      */
-    public function loginAt($param=null){
+    public function loginAt($id){
 
         $now = date("Y-m-d H:i:s");
-        if(!empty($param)){
+        $this->db->where('id_user',$id);
+        if($this->db->update('loginAt',$now)){
+           return true;
+        } else {
+            return false;
+        }     
+    }
 
-            $where=array(
-            'loginSyst'=>$param
-            );
-        
-            $data = array(
-                'loginAt'=>$now
-            );  
-           $this->db->where($where);
-           $this->db->update('adminsyst',$data);                  
-        }
-       
+    /**
+     * Suivre l'activité d'un utilisateur 
+     */
+    public function last_activity(){
+
+        $now = date("Y-m-d H:i:s");
+        $this->db->where('id_user',$id);
+        if($this->db->update('loginEnd',$now)){
+           return true;
+        } else {
+            return false;
+        } 
+
     }
     
-    /**
-     * Enregistrer l'heure à laquelle on se déconnecte
-     */
-    public function logout($param=null){
-
-        $now = date("Y-m-d H:i:s");
-        if(!empty($param)){
-
-            $where=array(
-            'loginSyst'=>$param
-            );
-        
-            $data = array(
-                'loginEnd'=>$now
-            );  
-           $this->db->where($where);
-           $this->db->update('adminsyst',$data);   
-
-        }
-    }
 
    }
 
