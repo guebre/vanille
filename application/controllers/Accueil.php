@@ -2,7 +2,7 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Signin extends MY_controller{
+class Accueil extends MY_controller{
     
     public function __construct(){
 
