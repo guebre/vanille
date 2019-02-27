@@ -7,6 +7,7 @@ class Accueil extends MY_controller{
     public function __construct(){
 
         parent::__construct();
+        $this->load->model('accueil_model');
         $this->load->library('encryption');
         $this->form_validation->set_error_delimiters('<div class="alert alert-danger" role="alert">','</div>');
     }
